@@ -71,6 +71,7 @@ function run() {
             core.debug(JSON.stringify(mutations));
             if (summary) {
                 core.summary.addCodeBlock(mutations, "json");
+                yield core.summary.write();
             }
         }
         catch (error) {

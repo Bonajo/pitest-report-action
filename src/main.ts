@@ -30,6 +30,7 @@ async function run(): Promise<void> {
         core.debug(JSON.stringify(mutations));
         if(summary){
             core.summary.addCodeBlock(mutations, "json");
+            await core.summary.write()
         }
     }catch(error){
         if (error instanceof Error) {
