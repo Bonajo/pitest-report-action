@@ -68,9 +68,8 @@ function run() {
             const summary = core.getBooleanInput("summary");
             const parser = new fast_xml_parser_1.XMLParser();
             const mutations = parser.parse(data);
-            core.debug(JSON.stringify(mutations));
             if (summary) {
-                core.summary.addCodeBlock(mutations, "json");
+                core.summary.addCodeBlock(JSON.stringify(mutations), "json");
                 yield core.summary.write();
             }
         }

@@ -27,9 +27,8 @@ async function run(): Promise<void> {
 
         const parser = new XMLParser();
         const mutations = parser.parse(data);
-        core.debug(JSON.stringify(mutations));
         if(summary){
-            core.summary.addCodeBlock(mutations, "json");
+            core.summary.addCodeBlock(JSON.stringify(mutations), "json");
             await core.summary.write()
         }
     }catch(error){
