@@ -6,7 +6,7 @@
   "scripts": {
     "test": "test",
     "build": "tsc",
-    "package": "ncc build --source-map"
+    "package": "ncc build --source-map src/main.ts"
   },
   "repository": {
     "type": "git",
