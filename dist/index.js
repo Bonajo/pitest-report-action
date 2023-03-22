@@ -48,7 +48,7 @@ function readFile(pattern) {
         const globber = yield glob.create(pattern);
         const files = yield globber.glob();
         if (files.length == 0) {
-            throw new Error("No matching file found");
+            throw new Error(`No matching file found for ${pattern}`);
         }
         else if (files.length > 1) {
             core.warning(`Action supports only one mutations.xml at a time, will only use ${files[0]}`);
