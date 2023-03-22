@@ -1,0 +1,15 @@
+name: 'Pitest report'
+description: 'Publish the pitest report'
+inputs:
+  file:
+    description: 'Pitest report file (only supports xml)'
+    required: false
+    default: '**/pit-reports/mutations.xml'
+  summary:
+    description: 'The results are published as part of the workflow summary'
+    required: false
+    default: true
+
+runs:
+  using: 'node16'
+  main: 'dist/index.js'
