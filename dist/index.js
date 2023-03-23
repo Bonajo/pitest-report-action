@@ -7230,8 +7230,8 @@ function run() {
                 if (mutation.attr_status === "SURVIVED") {
                     const properties = {
                         title: mutation.description,
-                        file: mutation.sourceFile,
-                        startLine: mutation.lineNumber
+                        file: "mutations.xml",
+                        startLine: 1
                     };
                     core.warning(mutation.description, properties);
                 }

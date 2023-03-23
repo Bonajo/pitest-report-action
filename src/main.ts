@@ -15,8 +15,8 @@ async function run(): Promise<void> {
             if(mutation.attr_status === "SURVIVED"){
                 const properties: AnnotationProperties = {
                     title: mutation.description,
-                    file: mutation.sourceFile,
-                    startLine: mutation.lineNumber
+                    file: "mutations.xml",
+                    startLine: 1
                 }
                 core.warning(mutation.description, properties);
             }
