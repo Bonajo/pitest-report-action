@@ -4,7 +4,7 @@
   "description": "Publish pitest reports from GitHub Action",
   "main": "dist/main.js",
   "scripts": {
-    "test": "test",
+    "test": "jest",
     "build": "tsc",
     "package": "ncc build --source-map src/main.ts"
   },
@@ -33,6 +33,7 @@
     "@vercel/ncc": "^0.36.1",
     "jest": "^29.5.0",
     "ts-jest": "^29.0.5",
+    "ts-node": "^10.9.1",
     "typescript": "^5.0.2"
   }
 }
