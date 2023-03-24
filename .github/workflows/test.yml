@@ -3,8 +3,6 @@ on: [push]
 jobs:
   test-action:
     runs-on: ubuntu-latest
-    permissions:
-      checks: write
     name: Test the pitest report action
     steps:
       - name: Checkout
