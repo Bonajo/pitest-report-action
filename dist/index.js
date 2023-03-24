@@ -14176,7 +14176,7 @@ function run() {
                 core.setFailed(`Annotations should be one of ALL, KILLED or SURVIVED, but was ${annotationsString}`);
             }
             const annotationTypes = annotationsString;
-            if (output !== "check" && output !== "summary") {
+            if (output !== "checks" && output !== "summary") {
                 core.setFailed(`Ouput should either be 'check' or 'summary', but is ${output}`);
             }
             if (!maxAnnotations || isNaN(maxAnnotations)) {
@@ -14188,7 +14188,7 @@ function run() {
             const mutations = (0, parser_1.parseMutationReport)(data);
             const basePath = (0, parser_1.getSourcePath)(path);
             const annotations = (0, annotation_1.createAnnotations)(mutations, maxAnnotations, annotationTypes, basePath);
-            if (output === "check") {
+            if (output === "checks") {
                 const token = core.getInput("token");
                 const octokit = github.getOctokit(token);
                 yield octokit.rest.checks.create({

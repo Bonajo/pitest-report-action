@@ -19,7 +19,7 @@ async function run(): Promise<void> {
         }
         const annotationTypes = <AnnotationType>annotationsString;
 
-        if(output !== "check" && output !== "summary"){
+        if(output !== "checks" && output !== "summary"){
             core.setFailed(`Ouput should either be 'check' or 'summary', but is ${output}`);
         }
 
@@ -34,7 +34,7 @@ async function run(): Promise<void> {
         const basePath = getSourcePath(path);
         const annotations = createAnnotations(mutations, maxAnnotations, annotationTypes, basePath);
 
-        if(output === "check"){
+        if(output === "checks"){
             const token = core.getInput("token");
             const octokit = github.getOctokit(token);
             await octokit.rest.checks.create({

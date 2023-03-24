@@ -14,9 +14,9 @@ inputs:
     required: false
     default: SURVIVED
   output:
-    description: Output location of the annotations (check, summary)
+    description: Output location of the annotations (checks, summary)
     required: false
-    default: check
+    default: checks
   max-annotations:
     description: Limit the number of annotations that are generated (max 50)
     required: false
