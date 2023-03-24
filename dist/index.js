@@ -14300,6 +14300,7 @@ const fast_xml_parser_1 = __nccwpck_require__(2603);
 const glob = __importStar(__nccwpck_require__(8090));
 const core = __importStar(__nccwpck_require__(2186));
 const promises_1 = __importDefault(__nccwpck_require__(3292));
+const node_path_1 = __importDefault(__nccwpck_require__(9411));
 function getPath(pattern) {
     return __awaiter(this, void 0, void 0, function* () {
         const globber = yield glob.create(pattern);
@@ -14311,10 +14312,10 @@ function getPath(pattern) {
             core.warning(`Action supports only one mutations.xml at a time, will only use ${files[0]}`);
         }
         const file = files[0];
-        if (!file.endsWith('xml')) {
+        if (node_path_1.default.extname(file) !== ".xml") {
             throw new Error(`Matched file (${file}) doesn't end in 'xml'`);
         }
-        return file;
+        return node_path_1.default.relative(process.cwd(), file);
     });
 }
 exports.getPath = getPath;
@@ -14427,6 +14428,14 @@ module.exports = require("https");
 
 "use strict";
 module.exports = require("net");
+
+/***/ }),
+
+/***/ 9411:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("node:path");
 
 /***/ }),
 

@@ -3,6 +3,7 @@ import * as glob from "@actions/glob";
 import * as core from "@actions/core";
 import fs from "fs/promises";
 import {Report} from "./report";
+import path from "node:path";
 
 export async function getPath(pattern: string): Promise<string> {
     const globber = await glob.create(pattern);
@@ -13,10 +14,10 @@ export async function getPath(pattern: string): Promise<string> {
         core.warning(`Action supports only one mutations.xml at a time, will only use ${files[0]}`);
     }
     const file = files[0]
-    if(!file.endsWith('xml')){
+    if(path.extname(file) !== ".xml"){
         throw new Error(`Matched file (${file}) doesn't end in 'xml'`)
     }
-    return file;
+    return path.relative(process.cwd(), file);
 }
 
 export async function readFile(path: string): Promise<string> {

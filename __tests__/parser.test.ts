@@ -23,6 +23,11 @@ test('getPath with multiple matched files should warn', async () => {
    expect(core.warning).toBeCalled();
 });
 
+test('getPath should work for valid file', async () => {
+   const path = await getPath('mutations.xml');
+   await expect(path).toBe("mutations.xml");
+});
+
 test('getPath with non xml should throw', async () => {
    await expect(getPath('package.json')).rejects.toThrow("xml");
 });
