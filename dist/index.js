@@ -14183,9 +14183,10 @@ function run() {
                 core.setFailed(`Max number of annotations should be a number and max of 50, but is ${maxAnnotations}`);
             }
             // Read the mutations.xml and parse to objects
-            const data = yield (0, parser_1.readFile)(file);
+            const path = yield (0, parser_1.getPath)(file);
+            const data = yield (0, parser_1.readFile)(path);
             const mutations = (0, parser_1.parseMutationReport)(data);
-            const basePath = (0, parser_1.getSourcePath)(file);
+            const basePath = (0, parser_1.getSourcePath)(path);
             const annotations = (0, annotation_1.createAnnotations)(mutations, maxAnnotations, annotationTypes, basePath);
             if (output === "check") {
                 const token = core.getInput("token");
@@ -14294,12 +14295,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getSourcePath = exports.parseMutationReport = exports.readFile = void 0;
+exports.getSourcePath = exports.parseMutationReport = exports.readFile = exports.getPath = void 0;
 const fast_xml_parser_1 = __nccwpck_require__(2603);
 const glob = __importStar(__nccwpck_require__(8090));
 const core = __importStar(__nccwpck_require__(2186));
 const promises_1 = __importDefault(__nccwpck_require__(3292));
-function readFile(pattern) {
+function getPath(pattern) {
     return __awaiter(this, void 0, void 0, function* () {
         const globber = yield glob.create(pattern);
         const files = yield globber.glob();
@@ -14313,7 +14314,13 @@ function readFile(pattern) {
         if (!file.endsWith('xml')) {
             throw new Error(`Matched file (${file}) doesn't end in 'xml'`);
         }
-        return yield promises_1.default.readFile(file, { encoding: 'utf8' });
+        return file;
+    });
+}
+exports.getPath = getPath;
+function readFile(path) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return yield promises_1.default.readFile(path, { encoding: 'utf8' });
     });
 }
 exports.readFile = readFile;

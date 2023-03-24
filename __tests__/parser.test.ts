@@ -1,4 +1,4 @@
-import {getSourcePath, parseMutationReport, readFile} from '../src/parser';
+import {getPath, getSourcePath, parseMutationReport, readFile} from '../src/parser';
 import * as core from "@actions/core";
 
 import {expect, test, jest} from '@jest/globals';
@@ -11,20 +11,20 @@ test('readFile should read file', async () => {
    expect(xml).toBeTruthy();
 });
 
-test('unknown file should throw error', async () => {
-   await expect(readFile('test.xml')).rejects.toThrow("No matching file");
+test('getPath unknown file should throw error', async () => {
+   await expect(getPath('test.xml')).rejects.toThrow("No matching file");
 });
 
-test('readFile with multiple matched files should warn', async () => {
+test('getPath with multiple matched files should warn', async () => {
    jest.spyOn(core, 'warning').mockImplementation(jest.fn())
    try{
-      await readFile("*.json");
+      await getPath("*.json");
    }catch(ignored){  }
    expect(core.warning).toBeCalled();
 });
 
-test('readFile with non xml should throw', async () => {
-   await expect(readFile('package.json')).rejects.toThrow("xml");
+test('getPath with non xml should throw', async () => {
+   await expect(getPath('package.json')).rejects.toThrow("xml");
 });
 
 test('parseMutationReport should parse valid mutations.xml', async () => {

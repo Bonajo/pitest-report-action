@@ -4,7 +4,7 @@ import * as core from "@actions/core";
 import fs from "fs/promises";
 import {Report} from "./report";
 
-export async function readFile(pattern: string): Promise<string> {
+export async function getPath(pattern: string): Promise<string> {
     const globber = await glob.create(pattern);
     const files = await globber.glob();
     if(files.length == 0){
@@ -16,8 +16,11 @@ export async function readFile(pattern: string): Promise<string> {
     if(!file.endsWith('xml')){
         throw new Error(`Matched file (${file}) doesn't end in 'xml'`)
     }
+    return file;
+}
 
-    return await fs.readFile(file, {encoding: 'utf8'});
+export async function readFile(path: string): Promise<string> {
+    return await fs.readFile(path, {encoding: 'utf8'});
 }
 
 export function parseMutationReport(data: string): Report {
