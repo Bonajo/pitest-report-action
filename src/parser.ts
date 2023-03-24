@@ -2,7 +2,7 @@ import {X2jOptionsOptional, XMLParser} from "fast-xml-parser";
 import * as glob from "@actions/glob";
 import * as core from "@actions/core";
 import fs from "fs/promises";
-
+import {Report} from "./report";
 
 export async function readFile(pattern: string): Promise<string> {
     const globber = await glob.create(pattern);
@@ -35,4 +35,17 @@ export function parseMutationReport(data: string): Report {
     }
     const parser = new XMLParser(options);
     return parser.parse(data);
+}
+
+/**
+ * For now, we assume that the mutations.xml file is inside the target directory
+ * @param file path to the mutations.xml file
+ * @return base path pointing to src directory
+ */
+export function getSourcePath(file: string): string {
+    const targetIndex = file.indexOf("target");
+    if(targetIndex > -1){
+        return `${file.substring(0, targetIndex)}src/main/java`;
+    }
+    throw new Error(`Cannot find src directory`)
 }
