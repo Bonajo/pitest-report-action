@@ -9,7 +9,30 @@ inputs:
     description: 'The results are published as part of the workflow summary'
     required: false
     default: true
-
+  annotation-types:
+    description: Generate annotation for status (ALL, SURVIVED, KILLED)
+    required: false
+    default: SURVIVED
+  output:
+    description: Output location of the annotations (check, summary)
+    required: false
+    default: check
+  max-annotations:
+    description: Limit the number of annotations that are generated (max 50)
+    required: false
+    default: 10
+  token:
+    description: GitHub Access Token
+    required: false
+    default: ${{ github.token }}
+outputs:
+  killed:
+    description: "Count of killed mutations"
+  survived:
+    description: "Count of survived mutations"
 runs:
   using: 'node16'
   main: 'dist/index.js'
+branding:
+  icon: 'sliders'
+  color: purple
