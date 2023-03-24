@@ -1,4 +1,6 @@
-interface Mutation {
+export type MutationStatus = "KILLED" |"SURVIVED";
+
+export interface Mutation {
     sourceFile: string,
     mutatedClass: string
     mutatedMethod: string
@@ -10,15 +12,15 @@ interface Mutation {
     killingTest: string
     description: string
     attr_detected: boolean
-    attr_status: "KILLED" |"SURVIVED"
+    attr_status: MutationStatus
     attr_numberOfTestsRun: number
 
 }
 
-interface Mutations {
+export interface Mutations {
     mutation: Array<Mutation>
 }
 
-interface Report {
+export interface Report {
     mutations: Mutations
 }
