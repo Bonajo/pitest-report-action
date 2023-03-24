@@ -7,7 +7,17 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+      - name: Test project
+        run: mvn -f testproject/pom.xml clean test
+      - name: Create Pitest report
+        run: mvn -f testproject/pom.xml test-compile org.pitest:pitest-maven:mutationCoverage -DoutputFormats=XML
       - name: Publish pitest report
         uses: ./
         with:
-          file: 'mutations.xml'
+          file: 'testproject/**/mutations.xml'
