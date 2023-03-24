@@ -14226,8 +14226,8 @@ function run() {
                     });
                 }
             }
-            const results = annotations.reduce((acc, val) => {
-                val.annotation_level === "notice" ? acc.SURVIVED++ : acc.KILLED++;
+            const results = mutations.mutations.mutation.reduce((acc, val) => {
+                val.attr_status === "SURVIVED" ? acc.SURVIVED++ : acc.KILLED++;
                 return acc;
             }, { KILLED: 0, SURVIVED: 0 });
             core.setOutput("killed", results.KILLED);
