@@ -14101,7 +14101,7 @@ function createAnnotations(report, maxAnnotations, annotationType, basePath) {
         .slice(0, maxAnnotations)
         .map(m => {
         const annotation = {
-            path: `${basePath}/${m.mutatedClass.replace(/\./g, "/")}`,
+            path: `${basePath}/${m.mutatedClass.replace(/\./g, "/")}.java`,
             start_line: m.lineNumber,
             end_line: m.lineNumber,
             annotation_level: m.attr_status === "KILLED" ? "notice" : "warning",
