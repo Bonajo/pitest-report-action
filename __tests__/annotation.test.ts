@@ -32,7 +32,7 @@ test('createAnnotations should return valid annotations', async () => {
     // Make a copy of the report
     const longTitleReport: Report = JSON.parse(JSON.stringify(report));
     // Set a long string as sourceFile, as this is used as part of the title of the annotation
-    longTitleReport.mutations.mutation[0].sourceFile = "test".repeat(70);
+    longTitleReport.mutations.mutation[0].mutatedClass = "test".repeat(70);
     const annotations = createAnnotations(longTitleReport, 1, "ALL", "somedir");
     expect(annotations[0].title?.length).toBe(255);
 });

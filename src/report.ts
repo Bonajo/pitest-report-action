@@ -9,7 +9,7 @@ export interface Mutation {
     mutator: string
     indexes: Array<{index: number}>
     blocks: Array<{block: number}>
-    killingTest: string
+    killingTest?: string
     description: string
     attr_detected: boolean
     attr_status: MutationStatus
