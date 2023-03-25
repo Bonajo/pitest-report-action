@@ -21,4 +21,4 @@ jobs:
         uses: ./
         with:
           file: 'testproject/**/mutations.xml'
-          output: 'checks'
+          output: 'summary'
