@@ -14095,7 +14095,7 @@ function wrappy (fn, cb) {
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.createAnnotations = void 0;
-function createAnnotations(report, maxAnnotations, annotationType, basePath) {
+function createAnnotations(report, maxAnnotations, annotationType) {
     return report.mutations.mutation
         .filter(m => annotationType === "ALL" || m.attr_status === annotationType)
         .slice(0, maxAnnotations)
@@ -14206,9 +14206,8 @@ function run() {
             const path = yield (0, parser_1.getPath)(file);
             const data = yield (0, parser_1.readFile)(path);
             const mutations = (0, parser_1.parseMutationReport)(data);
-            const basePath = (0, parser_1.getSourcePath)(path);
             // Create the annotations
-            const annotations = (0, annotation_1.createAnnotations)(mutations, maxAnnotations, annotationTypes, basePath);
+            const annotations = (0, annotation_1.createAnnotations)(mutations, maxAnnotations, annotationTypes);
             // Create summary
             const results = mutations.mutations.mutation
                 .reduce((acc, val) => acc.process(val), new summary_1.Summary());
