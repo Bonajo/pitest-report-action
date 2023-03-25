@@ -14106,7 +14106,7 @@ function createAnnotations(report, maxAnnotations, annotationType, basePath) {
             end_line: m.lineNumber,
             annotation_level: m.attr_status === "KILLED" ? "notice" : "warning",
             message: limitStringSize(m.description, 64 * 1024),
-            raw_details: limitStringSize(`Mutator: ${m.mutator}\nKilling test: ${m.killingTest}`, 64 * 1024),
+            raw_details: limitStringSize(JSON.stringify(m, null, 2), 64 * 1024),
             title: limitStringSize(`${m.attr_status} -> ${m.mutatedClass}:${m.mutatedMethod}`, 255)
         };
         return annotation;

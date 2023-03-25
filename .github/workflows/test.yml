@@ -24,7 +24,7 @@ jobs:
           file: 'testproject/**/mutations.xml'
           output: checks
           summary: true
-          annotation-types: ALL
+          annotation-types: SURVIVED
           max-annotations: 15
       - name: Check outputs
         run: |

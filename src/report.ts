@@ -14,7 +14,6 @@ export interface Mutation {
     attr_detected: boolean
     attr_status: MutationStatus
     attr_numberOfTestsRun: number
-
 }
 
 export interface Mutations {
