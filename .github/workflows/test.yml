@@ -18,7 +18,14 @@ jobs:
       - name: Create Pitest report
         run: mvn -f testproject/pom.xml test-compile org.pitest:pitest-maven:mutationCoverage -DoutputFormats=XML
       - name: Publish pitest report
+        id: pitest
         uses: ./
         with:
           file: 'testproject/**/mutations.xml'
-          output: 'checks'
+          output: checks
+          summary: true
+          annotation-types: ALL
+          max-annotations: 15
+      - name: Check outputs
+        run: |
+          echo "KILLED: ${{ steps.pitest.outputs.killed }}, SURVIVED: ${{ steps.pitest.outputs.survived }}"
