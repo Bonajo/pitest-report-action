@@ -2,7 +2,7 @@
 <mutations>
     <mutation detected='true' status='KILLED' numberOfTestsRun='4'>
         <sourceFile>PGTableCreator.java</sourceFile>
-        <mutatedClass>io.github.fontysvenlo.tablegenerator.PGTableCreator</mutatedClass>
+        <mutatedClass>io.github.bonajo.tablegenerator.PGTableCreator</mutatedClass>
         <mutatedMethod>processAnnotations</mutatedMethod>
         <methodDescription>(Ljava/lang/String;Ljava/lang/reflect/Field;)Ljava/lang/String;</methodDescription>
         <lineNumber>76</lineNumber>
@@ -14,13 +14,13 @@
             <block>4</block>
         </blocks>
         <killingTest>
-            io.github.fontysvenlo.ddlgenerator.StudentTableGeneratorTest.[engine:junit-jupiter]/[class:io.github.fontysvenlo.ddlgenerator.StudentTableGeneratorTest]/[method:idGeneratesPrimaryKey()]
+            io.github.bonajo.ddlgenerator.StudentTableGeneratorTest.[engine:junit-jupiter]/[class:io.github.bonajo.ddlgenerator.StudentTableGeneratorTest]/[method:idGeneratesPrimaryKey()]
         </killingTest>
         <description>negated conditional</description>
     </mutation>
     <mutation detected='true' status='KILLED' numberOfTestsRun='14'>
         <sourceFile>PGTableCreator.java</sourceFile>
-        <mutatedClass>io.github.fontysvenlo.tablegenerator.PGTableCreator</mutatedClass>
+        <mutatedClass>io.github.bonajo.tablegenerator.PGTableCreator</mutatedClass>
         <mutatedMethod>processAnnotations</mutatedMethod>
         <methodDescription>(Ljava/lang/String;Ljava/lang/reflect/Field;)Ljava/lang/String;</methodDescription>
         <lineNumber>77</lineNumber>
@@ -32,14 +32,14 @@
             <block>6</block>
         </blocks>
         <killingTest>
-            io.github.fontysvenlo.ddlgenerator.ModuleTableGeneratorTest.[engine:junit-jupiter]/[class:io.github.fontysvenlo.ddlgenerator.ModuleTableGeneratorTest]/[test-template:columnDefs(java.lang.String,
+            io.github.bonajo.ddlgenerator.ModuleTableGeneratorTest.[engine:junit-jupiter]/[class:io.github.bonajo.ddlgenerator.ModuleTableGeneratorTest]/[test-template:columnDefs(java.lang.String,
             java.lang.String)]/[test-template-invocation:#1]
         </killingTest>
         <description>negated conditional</description>
     </mutation>
     <mutation detected='true' status='KILLED' numberOfTestsRun='3'>
         <sourceFile>PGTableCreator.java</sourceFile>
-        <mutatedClass>io.github.fontysvenlo.tablegenerator.PGTableCreator</mutatedClass>
+        <mutatedClass>io.github.bonajo.tablegenerator.PGTableCreator</mutatedClass>
         <mutatedMethod>processAnnotations</mutatedMethod>
         <methodDescription>(Ljava/lang/String;Ljava/lang/reflect/Field;)Ljava/lang/String;</methodDescription>
         <lineNumber>79</lineNumber>
@@ -51,13 +51,13 @@
             <block>9</block>
         </blocks>
         <killingTest>
-            io.github.fontysvenlo.ddlgenerator.StudentTableGeneratorTest.[engine:junit-jupiter]/[class:io.github.fontysvenlo.ddlgenerator.StudentTableGeneratorTest]/[method:idGeneratesPrimaryKey()]
+            io.github.bonajo.ddlgenerator.StudentTableGeneratorTest.[engine:junit-jupiter]/[class:io.github.bonajo.ddlgenerator.StudentTableGeneratorTest]/[method:idGeneratesPrimaryKey()]
         </killingTest>
         <description>negated conditional</description>
     </mutation>
     <mutation detected='true' status='KILLED' numberOfTestsRun='2'>
         <sourceFile>PGTableCreator.java</sourceFile>
-        <mutatedClass>io.github.fontysvenlo.tablegenerator.PGTableCreator</mutatedClass>
+        <mutatedClass>io.github.bonajo.tablegenerator.PGTableCreator</mutatedClass>
         <mutatedMethod>processAnnotations</mutatedMethod>
         <methodDescription>(Ljava/lang/String;Ljava/lang/reflect/Field;)Ljava/lang/String;</methodDescription>
         <lineNumber>83</lineNumber>
@@ -69,14 +69,14 @@
             <block>16</block>
         </blocks>
         <killingTest>
-            io.github.fontysvenlo.ddlgenerator.ModuleTableGeneratorTest.[engine:junit-jupiter]/[class:io.github.fontysvenlo.ddlgenerator.ModuleTableGeneratorTest]/[test-template:columnDefs(java.lang.String,
+            io.github.bonajo.ddlgenerator.ModuleTableGeneratorTest.[engine:junit-jupiter]/[class:io.github.bonajo.ddlgenerator.ModuleTableGeneratorTest]/[test-template:columnDefs(java.lang.String,
             java.lang.String)]/[test-template-invocation:#7]
         </killingTest>
         <description>negated conditional</description>
     </mutation>
     <mutation detected='true' status='KILLED' numberOfTestsRun='2'>
         <sourceFile>PGTableCreator.java</sourceFile>
-        <mutatedClass>io.github.fontysvenlo.tablegenerator.PGTableCreator</mutatedClass>
+        <mutatedClass>io.github.bonajo.tablegenerator.PGTableCreator</mutatedClass>
         <mutatedMethod>processAnnotations</mutatedMethod>
         <methodDescription>(Ljava/lang/String;Ljava/lang/reflect/Field;)Ljava/lang/String;</methodDescription>
         <lineNumber>85</lineNumber>
@@ -88,14 +88,14 @@
             <block>20</block>
         </blocks>
         <killingTest>
-            io.github.fontysvenlo.ddlgenerator.ModuleTableGeneratorTest.[engine:junit-jupiter]/[class:io.github.fontysvenlo.ddlgenerator.ModuleTableGeneratorTest]/[test-template:columnDefs(java.lang.String,
+            io.github.bonajo.ddlgenerator.ModuleTableGeneratorTest.[engine:junit-jupiter]/[class:io.github.bonajo.ddlgenerator.ModuleTableGeneratorTest]/[test-template:columnDefs(java.lang.String,
             java.lang.String)]/[test-template-invocation:#7]
         </killingTest>
         <description>negated conditional</description>
     </mutation>
     <mutation detected='true' status='KILLED' numberOfTestsRun='4'>
         <sourceFile>PGTableCreator.java</sourceFile>
-        <mutatedClass>io.github.fontysvenlo.tablegenerator.PGTableCreator</mutatedClass>
+        <mutatedClass>io.github.bonajo.tablegenerator.PGTableCreator</mutatedClass>
         <mutatedMethod>processAnnotations</mutatedMethod>
         <methodDescription>(Ljava/lang/String;Ljava/lang/reflect/Field;)Ljava/lang/String;</methodDescription>
         <lineNumber>88</lineNumber>
@@ -107,14 +107,14 @@
             <block>27</block>
         </blocks>
         <killingTest>
-            io.github.fontysvenlo.ddlgenerator.ModuleTableGeneratorTest.[engine:junit-jupiter]/[class:io.github.fontysvenlo.ddlgenerator.ModuleTableGeneratorTest]/[test-template:columnDefs(java.lang.String,
+            io.github.bonajo.ddlgenerator.ModuleTableGeneratorTest.[engine:junit-jupiter]/[class:io.github.bonajo.ddlgenerator.ModuleTableGeneratorTest]/[test-template:columnDefs(java.lang.String,
             java.lang.String)]/[test-template-invocation:#5]
         </killingTest>
         <description>negated conditional</description>
     </mutation>
     <mutation detected='true' status='KILLED' numberOfTestsRun='2'>
         <sourceFile>PGTableCreator.java</sourceFile>
-        <mutatedClass>io.github.fontysvenlo.tablegenerator.PGTableCreator</mutatedClass>
+        <mutatedClass>io.github.bonajo.tablegenerator.PGTableCreator</mutatedClass>
         <mutatedMethod>processAnnotations</mutatedMethod>
         <methodDescription>(Ljava/lang/String;Ljava/lang/reflect/Field;)Ljava/lang/String;</methodDescription>
         <lineNumber>94</lineNumber>
@@ -126,15 +126,15 @@
             <block>45</block>
         </blocks>
         <killingTest>
-            io.github.fontysvenlo.ddlgenerator.StudentTableGeneratorTest.[engine:junit-jupiter]/[class:io.github.fontysvenlo.ddlgenerator.StudentTableGeneratorTest]/[method:firstNameGeneratesText()]
+            io.github.bonajo.ddlgenerator.StudentTableGeneratorTest.[engine:junit-jupiter]/[class:io.github.bonajo.ddlgenerator.StudentTableGeneratorTest]/[method:firstNameGeneratesText()]
         </killingTest>
         <description>replaced return value with &quot;&quot; for
-            io/github/fontysvenlo/tablegenerator/PGTableCreator::processAnnotations
+            io.github.bonajo/tablegenerator/PGTableCreator::processAnnotations
         </description>
     </mutation>
     <mutation detected='true' status='KILLED' numberOfTestsRun='2'>
         <sourceFile>GeneratorMain.java</sourceFile>
-        <mutatedClass>io.github.fontysvenlo.tablegenerator.GeneratorMain</mutatedClass>
+        <mutatedClass>io.github.bonajo.tablegenerator.GeneratorMain</mutatedClass>
         <mutatedMethod>main</mutatedMethod>
         <methodDescription>([Ljava/lang/String;)V</methodDescription>
         <lineNumber>16</lineNumber>
@@ -146,13 +146,13 @@
             <block>0</block>
         </blocks>
         <killingTest>
-            io.github.fontysvenlo.tablegenerator.GeneratorMainTest.[engine:junit-jupiter]/[class:io.github.fontysvenlo.tablegenerator.GeneratorMainTest]/[method:testMainWithValidClass()]
+            io.github.bonajo.tablegenerator.GeneratorMainTest.[engine:junit-jupiter]/[class:io.github.bonajo.tablegenerator.GeneratorMainTest]/[method:testMainWithValidClass()]
         </killingTest>
         <description>changed conditional boundary</description>
     </mutation>
     <mutation detected='true' status='KILLED' numberOfTestsRun='1'>
         <sourceFile>GeneratorMain.java</sourceFile>
-        <mutatedClass>io.github.fontysvenlo.tablegenerator.GeneratorMain</mutatedClass>
+        <mutatedClass>io.github.bonajo.tablegenerator.GeneratorMain</mutatedClass>
         <mutatedMethod>main</mutatedMethod>
         <methodDescription>([Ljava/lang/String;)V</methodDescription>
         <lineNumber>16</lineNumber>
@@ -164,13 +164,13 @@
             <block>0</block>
         </blocks>
         <killingTest>
-            io.github.fontysvenlo.tablegenerator.GeneratorMainTest.[engine:junit-jupiter]/[class:io.github.fontysvenlo.tablegenerator.GeneratorMainTest]/[method:testMainWithoutArgs()]
+            io.github.bonajo.tablegenerator.GeneratorMainTest.[engine:junit-jupiter]/[class:io.github.bonajo.tablegenerator.GeneratorMainTest]/[method:testMainWithoutArgs()]
         </killingTest>
         <description>negated conditional</description>
     </mutation>
     <mutation detected='false' status='SURVIVED' numberOfTestsRun='1'>
         <sourceFile>GeneratorMain.java</sourceFile>
-        <mutatedClass>io.github.fontysvenlo.tablegenerator.GeneratorMain</mutatedClass>
+        <mutatedClass>io.github.bonajo.tablegenerator.GeneratorMain</mutatedClass>
         <mutatedMethod>main</mutatedMethod>
         <methodDescription>([Ljava/lang/String;)V</methodDescription>
         <lineNumber>25</lineNumber>
@@ -182,11 +182,11 @@
             <block>6</block>
         </blocks>
         <killingTest/>
-        <description>removed call to io/github/fontysvenlo/tablegenerator/PGTableCreator::createTable</description>
+        <description>removed call to io.github.bonajo/tablegenerator/PGTableCreator::createTable</description>
     </mutation>
     <mutation detected='true' status='KILLED' numberOfTestsRun='2'>
         <sourceFile>TypeMappings.java</sourceFile>
-        <mutatedClass>io.github.fontysvenlo.tablegenerator.TypeMappings</mutatedClass>
+        <mutatedClass>io.github.bonajo.tablegenerator.TypeMappings</mutatedClass>
         <mutatedMethod>getPGTypeName</mutatedMethod>
         <methodDescription>(Ljava/lang/Class;)Ljava/lang/String;</methodDescription>
         <lineNumber>37</lineNumber>
@@ -198,10 +198,10 @@
             <block>1</block>
         </blocks>
         <killingTest>
-            io.github.fontysvenlo.ddlgenerator.StudentTableGeneratorTest.[engine:junit-jupiter]/[class:io.github.fontysvenlo.ddlgenerator.StudentTableGeneratorTest]/[method:firstNameGeneratesText()]
+            io.github.bonajo.ddlgenerator.StudentTableGeneratorTest.[engine:junit-jupiter]/[class:io.github.bonajo.ddlgenerator.StudentTableGeneratorTest]/[method:firstNameGeneratesText()]
         </killingTest>
         <description>replaced return value with &quot;&quot; for
-            io/github/fontysvenlo/tablegenerator/TypeMappings::getPGTypeName
+            io.github.bonajo/tablegenerator/TypeMappings::getPGTypeName
         </description>
     </mutation>
 </mutations>
