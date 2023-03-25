@@ -14,7 +14,7 @@ class SummaryStat {
     }
 
     get total(): string {
-        return this._killed + this._survived.toString();
+        return (this._killed + this._survived).toString();
     }
 
     public increaseSurvived(): void {
@@ -32,7 +32,7 @@ export class Summary {
 
     public process(mutation: Mutation): Summary {
         if(!this.stats.has(mutation.mutatedClass)){
-            this.stats.set(mutation.mutatedMethod, new SummaryStat());
+            this.stats.set(mutation.mutatedClass, new SummaryStat());
         }
         const stat = this.stats.get(mutation.mutatedClass);
         if(mutation.attr_status === "KILLED"){
