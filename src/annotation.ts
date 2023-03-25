@@ -24,12 +24,12 @@ export function createAnnotations(
         .slice(0, maxAnnotations)
         .map(m => {
             const annotation: Annotation = {
-                path: `${basePath}/${m.mutatedClass.replace(/\./g, "/")}.java`,
+                path: m.mutatedClass,
                 start_line: m.lineNumber,
                 end_line: m.lineNumber,
                 annotation_level: m.attr_status === "KILLED" ? "notice" : "warning",
                 message: limitStringSize(`${m.attr_status} -> ${m.description}`, 64*1024),
-                raw_details: limitStringSize(`Mutator: ${m.mutator}\nKilling test: ${m.killingTest}`, 64*1024),
+                raw_details: limitStringSize(`*Mutator*: ${m.mutator}\nKilling test: ${m.killingTest}`, 64*1024),
                 title: limitStringSize(`${m.attr_status} -> ${m.sourceFile}.${m.mutatedMethod}`, 255)
             }
             return annotation;
