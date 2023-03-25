@@ -40,16 +40,3 @@ export function parseMutationReport(data: string): Report {
     const parser = new XMLParser(options);
     return parser.parse(data);
 }
-
-/**
- * For now, we assume that the mutations.xml file is inside the target directory
- * @param file path to the mutations.xml file
- * @return base path pointing to src directory
- */
-export function getSourcePath(file: string): string {
-    const targetIndex = file.indexOf("target");
-    if(targetIndex > -1){
-        return `${file.substring(0, targetIndex)}src/main/java`;
-    }
-    throw new Error(`Cannot find src directory`)
-}

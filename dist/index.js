@@ -14312,7 +14312,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getSourcePath = exports.parseMutationReport = exports.readFile = exports.getPath = void 0;
+exports.parseMutationReport = exports.readFile = exports.getPath = void 0;
 const fast_xml_parser_1 = __nccwpck_require__(2603);
 const glob = __importStar(__nccwpck_require__(8090));
 const core = __importStar(__nccwpck_require__(2186));
@@ -14359,19 +14359,6 @@ function parseMutationReport(data) {
     return parser.parse(data);
 }
 exports.parseMutationReport = parseMutationReport;
-/**
- * For now, we assume that the mutations.xml file is inside the target directory
- * @param file path to the mutations.xml file
- * @return base path pointing to src directory
- */
-function getSourcePath(file) {
-    const targetIndex = file.indexOf("target");
-    if (targetIndex > -1) {
-        return `${file.substring(0, targetIndex)}src/main/java`;
-    }
-    throw new Error(`Cannot find src directory`);
-}
-exports.getSourcePath = getSourcePath;
 
 
 /***/ }),
