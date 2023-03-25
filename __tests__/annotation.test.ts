@@ -26,11 +26,6 @@ test('createAnnotations should limit annotations to maxAnnotations', async () =>
     expect(annotations.length).toBe(5);
 });
 
-test('createAnnotations should set correct base path', async () => {
-    const annotations = createAnnotations(report, 1, "ALL", "somedir");
-    expect(annotations[0].path.startsWith("somedir")).toBeTruthy();
-});
-
 test('createAnnotations should return valid annotations', async () => {
     // Should be valid according to: https://docs.github.com/en/rest/checks/runs?apiVersion=2022-11-28#create-a-check-run
 

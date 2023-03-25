@@ -14162,6 +14162,7 @@ const core = __importStar(__nccwpck_require__(2186));
 const parser_1 = __nccwpck_require__(8412);
 const annotation_1 = __nccwpck_require__(161);
 const github = __importStar(__nccwpck_require__(5438));
+const summary_1 = __nccwpck_require__(2553);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -14226,19 +14227,14 @@ function run() {
                     });
                 }
             }
-            const results = mutations.mutations.mutation.reduce((acc, val) => {
-                val.attr_status === "SURVIVED" ? acc.SURVIVED++ : acc.KILLED++;
-                return acc;
-            }, { KILLED: 0, SURVIVED: 0 });
-            core.setOutput("killed", results.KILLED);
-            core.setOutput("survived", results.SURVIVED);
+            const results = mutations.mutations.mutation
+                .reduce((acc, val) => acc.process(val), new summary_1.Summary());
+            core.setOutput("killed", results.killed);
+            core.setOutput("survived", results.survived);
             if (summary) {
                 yield core.summary
                     .addHeading("Pitest results")
-                    .addTable([
-                    [{ data: 'Class', header: true }, { data: 'KILLED', header: true }, { data: 'SURVIVED', header: true }],
-                    ['All', results.KILLED.toString(), results.SURVIVED.toString()]
-                ])
+                    .addTable(results.toSummaryTable())
                     .write();
             }
         }
@@ -14355,6 +14351,78 @@ function getSourcePath(file) {
     throw new Error(`Cannot find src directory`);
 }
 exports.getSourcePath = getSourcePath;
+
+
+/***/ }),
+
+/***/ 2553:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Summary = void 0;
+class SummaryStat {
+    constructor() {
+        this._survived = 0;
+        this._killed = 0;
+    }
+    get survived() {
+        return this._survived.toString();
+    }
+    get killed() {
+        return this._killed.toString();
+    }
+    get total() {
+        return this._killed + this._survived.toString();
+    }
+    increaseSurvived() {
+        this._survived++;
+    }
+    increaseKilled() {
+        this._killed++;
+    }
+}
+class Summary {
+    constructor() {
+        this.stats = new Map();
+        this.total = new SummaryStat();
+    }
+    process(mutation) {
+        if (!this.stats.has(mutation.mutatedClass)) {
+            this.stats.set(mutation.mutatedMethod, new SummaryStat());
+        }
+        const stat = this.stats.get(mutation.mutatedClass);
+        if (mutation.attr_status === "KILLED") {
+            stat === null || stat === void 0 ? void 0 : stat.increaseKilled();
+            this.total.increaseKilled();
+        }
+        else {
+            stat === null || stat === void 0 ? void 0 : stat.increaseSurvived();
+            this.total.increaseSurvived();
+        }
+        return this;
+    }
+    get killed() {
+        return this.total.killed;
+    }
+    get survived() {
+        return this.total.survived;
+    }
+    toSummaryTable() {
+        const headers = [
+            { data: 'Class', header: true },
+            { data: 'Mutations', header: true },
+            { data: 'KILLED', header: true },
+            { data: 'SURVIVED', header: true }
+        ];
+        const rows = Array.from(this.stats.entries())
+            .map(v => [v[0], v[1].total, v[1].killed, v[1].survived]);
+        rows.push(["Total", this.total.total, this.total.killed, this.total.survived]);
+        return [headers, ...rows];
+    }
+}
+exports.Summary = Summary;
 
 
 /***/ }),

@@ -3,6 +3,7 @@ import * as core from '@actions/core';
 import {getPath, getSourcePath, parseMutationReport, readFile} from "./parser";
 import {createAnnotations, AnnotationType} from "./annotation";
 import * as github from '@actions/github';
+import {Summary} from "./summary";
 
 async function run(): Promise<void> {
     try{
@@ -69,21 +70,16 @@ async function run(): Promise<void> {
             }
         }
 
-        const results = mutations.mutations.mutation.reduce((acc, val) => {
-            val.attr_status === "SURVIVED" ? acc.SURVIVED++ : acc.KILLED++;
-            return acc;
-        }, {KILLED: 0, SURVIVED: 0});
+        const results = mutations.mutations.mutation
+            .reduce((acc, val) => acc.process(val), new Summary());
         
-        core.setOutput("killed", results.KILLED);
-        core.setOutput("survived", results.SURVIVED);
+        core.setOutput("killed", results.killed);
+        core.setOutput("survived", results.survived);
 
         if(summary){            
             await core.summary
                 .addHeading("Pitest results")
-                .addTable([
-                    [{data: 'Class', header: true}, {data: 'KILLED', header: true}, {data: 'SURVIVED', header: true}],
-                    ['All', results.KILLED.toString(), results.SURVIVED.toString()]
-                ])
+                .addTable(results.toSummaryTable())
                 .write();
         }
 
