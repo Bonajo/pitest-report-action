@@ -14225,7 +14225,7 @@ function run() {
                     status: 'completed',
                     conclusion: 'success',
                     output: {
-                        title: results.short,
+                        title: name,
                         summary: results.toSummaryMarkdown(),
                         annotations: [...annotations]
                     }
