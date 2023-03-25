@@ -14434,9 +14434,6 @@ class Summary {
     get total() {
         return this._total.total;
     }
-    get short() {
-        return `#Mutations: ${this.total}, KILLED: ${this.killed}, SURVIVED: ${this.survived}`;
-    }
     toSummaryTable() {
         const headers = [
             { data: 'Class', header: true },

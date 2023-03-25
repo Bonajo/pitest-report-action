@@ -1,4 +1,4 @@
-import {getPath, getSourcePath, parseMutationReport, readFile} from '../src/parser';
+import {getPath, parseMutationReport, readFile} from '../src/parser';
 import * as core from "@actions/core";
 
 import {expect, test, jest} from '@jest/globals';
@@ -35,13 +35,4 @@ test('getPath with non xml should throw', async () => {
 test('parseMutationReport should parse valid mutations.xml', async () => {
    const report = parseMutationReport(data);
    expect(report.mutations.mutation.length).toBe(2);
-})
-
-test('getSourcePath should give valid path', () => {
-   const srcPath = getSourcePath("somedir/target/pit-reports/mutations.xml");
-   expect(srcPath).toBe("somedir/src/main/java");
-})
-
-test('getSourcePath should throw when no target', () => {
-   expect(() => getSourcePath("somedir/pit-reports/mutations.xml")).toThrow("src")
 })

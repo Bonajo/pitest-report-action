@@ -57,10 +57,6 @@ export class Summary {
         return this._total.total;
     }
 
-    get short(): string {
-        return `#Mutations: ${this.total}, KILLED: ${this.killed}, SURVIVED: ${this.survived}`;
-    }
-
     public toSummaryTable(): SummaryTableRow[]{
         const headers = [
             {data: 'Class', header: true},

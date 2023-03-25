@@ -7,22 +7,22 @@ import testData from './testData.json';
 const report = <Report>testData;
 
 test('createAnnotations for ALL', async () => {
-    const annotations = createAnnotations(report, 50, "ALL", "somedir");
+    const annotations = createAnnotations(report, 50, "ALL");
     expect(annotations.length).toBe(11);
 });
 
 test('createAnnotations for SURVIVED', async () => {
-    const annotations = createAnnotations(report, 50, "SURVIVED", "somedir");
+    const annotations = createAnnotations(report, 50, "SURVIVED");
     expect(annotations.length).toBe(1);
 });
 
 test('createAnnotations for KILLED', async () => {
-    const annotations = createAnnotations(report, 50, "KILLED", "somedir");
+    const annotations = createAnnotations(report, 50, "KILLED");
     expect(annotations.length).toBe(10);
 });
 
 test('createAnnotations should limit annotations to maxAnnotations', async () => {
-    const annotations = createAnnotations(report, 5, "ALL", "somedir");
+    const annotations = createAnnotations(report, 5, "ALL");
     expect(annotations.length).toBe(5);
 });
 
@@ -33,6 +33,6 @@ test('createAnnotations should return valid annotations', async () => {
     const longTitleReport: Report = JSON.parse(JSON.stringify(report));
     // Set a long string as sourceFile, as this is used as part of the title of the annotation
     longTitleReport.mutations.mutation[0].mutatedClass = "test".repeat(70);
-    const annotations = createAnnotations(longTitleReport, 1, "ALL", "somedir");
+    const annotations = createAnnotations(longTitleReport, 1, "ALL");
     expect(annotations[0].title?.length).toBe(255);
 });

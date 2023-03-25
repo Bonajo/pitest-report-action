@@ -17,8 +17,7 @@ export interface Annotation {
 export function createAnnotations(
         report: Report,
         maxAnnotations: number,
-        annotationType: AnnotationType,
-        basePath: string): Annotation[] {
+        annotationType: AnnotationType): Annotation[] {
     return report.mutations.mutation
         .filter(m => annotationType === "ALL" || m.attr_status === annotationType)
         .slice(0, maxAnnotations)
