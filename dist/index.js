@@ -14172,6 +14172,10 @@ function run() {
             const annotationsString = core.getInput("annotation-types");
             const output = core.getInput("output");
             const maxAnnotations = parseInt(core.getInput("max-annotations"), 10);
+            const name = core.getInput("name");
+            const token = core.getInput("token");
+            const octokit = github.getOctokit(token);
+            let checksId;
             // Validate inputs
             if (!annotationsString || ['ALL', 'KILLED', 'SURVIVED'].indexOf(annotationsString) === -1) {
                 core.setFailed(`Annotations should be one of ALL, KILLED or SURVIVED, but was ${annotationsString}`);
@@ -14183,30 +14187,52 @@ function run() {
             if (!maxAnnotations || isNaN(maxAnnotations)) {
                 core.setFailed(`Max number of annotations should be a number and max of 50, but is ${maxAnnotations}`);
             }
+            // Create check run if needed
+            if (output === "checks") {
+                const checks = yield octokit.rest.checks.create({
+                    owner: github.context.repo.owner,
+                    repo: github.context.repo.repo,
+                    name: name,
+                    head_sha: github.context.sha,
+                    status: 'in_progress',
+                    output: {
+                        title: name,
+                        summary: ''
+                    }
+                });
+                checksId = checks.data.id;
+            }
             // Read the mutations.xml and parse to objects
             const path = yield (0, parser_1.getPath)(file);
             const data = yield (0, parser_1.readFile)(path);
             const mutations = (0, parser_1.parseMutationReport)(data);
             const basePath = (0, parser_1.getSourcePath)(path);
+            // Create the annotations
             const annotations = (0, annotation_1.createAnnotations)(mutations, maxAnnotations, annotationTypes, basePath);
+            // Create summary
+            const results = mutations.mutations.mutation
+                .reduce((acc, val) => acc.process(val), new summary_1.Summary());
+            // Set outputs
+            core.setOutput("killed", results.killed);
+            core.setOutput("survived", results.survived);
+            // Add the annotations
             if (output === "checks") {
-                const token = core.getInput("token");
-                const octokit = github.getOctokit(token);
-                yield octokit.rest.checks.create({
+                // Update the checks run
+                yield octokit.rest.checks.update({
+                    check_run_id: checksId,
                     owner: github.context.repo.owner,
                     repo: github.context.repo.repo,
-                    name: 'Pitest report',
-                    head_sha: github.context.sha,
                     status: 'completed',
-                    conclusion: 'neutral',
+                    conclusion: 'success',
                     output: {
-                        title: 'Pitest report results',
-                        summary: 'test',
+                        title: results.short,
+                        summary: results.toSummaryMarkdown(),
                         annotations: [...annotations]
                     }
                 });
             }
             else {
+                // Add annotations on the workflow itself
                 for (const annotation of annotations) {
                     let fn;
                     switch (annotation.annotation_level) {
@@ -14227,10 +14253,6 @@ function run() {
                     });
                 }
             }
-            const results = mutations.mutations.mutation
-                .reduce((acc, val) => acc.process(val), new summary_1.Summary());
-            core.setOutput("killed", results.killed);
-            core.setOutput("survived", results.survived);
             if (summary) {
                 yield core.summary
                     .addHeading("Pitest results")
@@ -14386,7 +14408,7 @@ class SummaryStat {
 class Summary {
     constructor() {
         this.stats = new Map();
-        this.total = new SummaryStat();
+        this._total = new SummaryStat();
     }
     process(mutation) {
         if (!this.stats.has(mutation.mutatedClass)) {
@@ -14395,19 +14417,25 @@ class Summary {
         const stat = this.stats.get(mutation.mutatedClass);
         if (mutation.attr_status === "KILLED") {
             stat === null || stat === void 0 ? void 0 : stat.increaseKilled();
-            this.total.increaseKilled();
+            this._total.increaseKilled();
         }
         else {
             stat === null || stat === void 0 ? void 0 : stat.increaseSurvived();
-            this.total.increaseSurvived();
+            this._total.increaseSurvived();
         }
         return this;
     }
     get killed() {
-        return this.total.killed;
+        return this._total.killed;
     }
     get survived() {
-        return this.total.survived;
+        return this._total.survived;
+    }
+    get total() {
+        return this._total.total;
+    }
+    get short() {
+        return `#Mutations: ${this.total}, KILLED: ${this.killed}, SURVIVED: ${this.survived}`;
     }
     toSummaryTable() {
         const headers = [
@@ -14418,8 +14446,16 @@ class Summary {
         ];
         const rows = Array.from(this.stats.entries())
             .map(v => [v[0], v[1].total, v[1].killed, v[1].survived]);
-        rows.push(["Total", this.total.total, this.total.killed, this.total.survived]);
+        rows.push(["Total", this.total, this.killed, this.survived]);
         return [headers, ...rows];
+    }
+    toSummaryMarkdown() {
+        const headers = '| Class | Mutations | KILLED | SURVIVED |';
+        const separator = '| --- | --- | --- | --- |';
+        const rows = Array.from(this.stats.entries())
+            .map(v => `| ${v[0]} | ${v[1].total} | ${v[1].killed} | ${v[1].survived} |`);
+        const total = `| Total | ${this.total} | ${this.killed} | ${this.survived} |`;
+        return [headers, separator, ...rows, total].join("\n");
     }
 }
 exports.Summary = Summary;

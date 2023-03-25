@@ -1,12 +1,16 @@
 name: 'Pitest report'
 description: 'Publish the pitest report'
 inputs:
+  name:
+    description: Name of the check run
+    required: false
+    default: Pitest report
   file:
-    description: 'Pitest report file (only supports xml)'
+    description: Pitest report file (only supports xml)
     required: false
     default: '**/pit-reports/mutations.xml'
   summary:
-    description: 'The results are published as part of the workflow summary'
+    description: The results are published as part of the workflow summary
     required: false
     default: true
   annotation-types:
@@ -27,9 +31,9 @@ inputs:
     default: ${{ github.token }}
 outputs:
   killed:
-    description: "Count of killed mutations"
+    description: Total number of killed mutations
   survived:
-    description: "Count of survived mutations"
+    description: Total number of survived mutations
 runs:
   using: 'node16'
   main: 'dist/index.js'

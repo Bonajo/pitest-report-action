@@ -28,7 +28,7 @@ class SummaryStat {
 
 export class Summary {
     private stats = new Map<string, SummaryStat>();
-    private readonly total = new SummaryStat();
+    private readonly _total = new SummaryStat();
 
     public process(mutation: Mutation): Summary {
         if(!this.stats.has(mutation.mutatedClass)){
@@ -37,20 +37,28 @@ export class Summary {
         const stat = this.stats.get(mutation.mutatedClass);
         if(mutation.attr_status === "KILLED"){
             stat?.increaseKilled()
-            this.total.increaseKilled();
+            this._total.increaseKilled();
         }else{
             stat?.increaseSurvived();
-            this.total.increaseSurvived();
+            this._total.increaseSurvived();
         }
         return this;
     }
 
     public get killed(): string {
-        return this.total.killed;
+        return this._total.killed;
     }
 
     public get survived(): string {
-        return this.total.survived;
+        return this._total.survived;
+    }
+
+    public get total(): string {
+        return this._total.total;
+    }
+
+    get short(): string {
+        return `#Mutations: ${this.total}, KILLED: ${this.killed}, SURVIVED: ${this.survived}`;
     }
 
     public toSummaryTable(): SummaryTableRow[]{
@@ -63,8 +71,17 @@ export class Summary {
         const rows = Array.from(this.stats.entries())
             .map(v => [v[0], v[1].total, v[1].killed, v[1].survived]);
 
-        rows.push(["Total", this.total.total, this.total.killed, this.total.survived])
+        rows.push(["Total", this.total, this.killed, this.survived])
 
         return [headers, ...rows];
+    }
+
+    public toSummaryMarkdown(): string {
+        const headers: string = '| Class | Mutations | KILLED | SURVIVED |';
+        const separator: string = '| --- | --- | --- | --- |';
+        const rows: string[] = Array.from(this.stats.entries())
+            .map(v => `| ${v[0]} | ${v[1].total} | ${v[1].killed} | ${v[1].survived} |`);
+        const total = `| Total | ${this.total} | ${this.killed} | ${this.survived} |`;
+        return [headers, separator, ...rows, total].join("\n");
     }
 }

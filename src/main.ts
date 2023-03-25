@@ -13,6 +13,10 @@ async function run(): Promise<void> {
         const annotationsString = core.getInput("annotation-types");
         const output = core.getInput("output");
         const maxAnnotations =  parseInt(core.getInput("max-annotations"), 10);
+        const name = core.getInput("name");
+        const token = core.getInput("token");
+        const octokit = github.getOctokit(token);
+        let checksId;
 
         // Validate inputs
         if(!annotationsString || ['ALL', 'KILLED', 'SURVIVED'].indexOf(annotationsString) === -1){
@@ -28,30 +32,56 @@ async function run(): Promise<void> {
             core.setFailed(`Max number of annotations should be a number and max of 50, but is ${maxAnnotations}`);
         }
 
+        // Create check run if needed
+        if(output === "checks"){
+            const checks = await octokit.rest.checks.create({
+                owner: github.context.repo.owner,
+                repo: github.context.repo.repo,
+                name: name,
+                head_sha: github.context.sha,
+                status: 'in_progress',
+                output: {
+                    title: name,
+                    summary: ''
+                }
+            });
+            checksId = checks.data.id;
+        }
+
         // Read the mutations.xml and parse to objects
         const path = await getPath(file);
         const data = await readFile(path);
         const mutations = parseMutationReport(data);
         const basePath = getSourcePath(path);
+
+        // Create the annotations
         const annotations = createAnnotations(mutations, maxAnnotations, annotationTypes, basePath);
 
+        // Create summary
+        const results = mutations.mutations.mutation
+            .reduce((acc, val) => acc.process(val), new Summary());
+
+        // Set outputs
+        core.setOutput("killed", results.killed);
+        core.setOutput("survived", results.survived);
+
+        // Add the annotations
         if(output === "checks"){
-            const token = core.getInput("token");
-            const octokit = github.getOctokit(token);
-            await octokit.rest.checks.create({
+            // Update the checks run
+            await octokit.rest.checks.update({
+                check_run_id: checksId,
                 owner: github.context.repo.owner,
                 repo: github.context.repo.repo,
-                name: 'Pitest report',
-                head_sha: github.context.sha,
                 status: 'completed',
-                conclusion: 'neutral',
+                conclusion: 'success',
                 output: {
-                    title: 'Pitest report results',
-                    summary: 'test',
+                    title: results.short,
+                    summary: results.toSummaryMarkdown(),
                     annotations: [...annotations]
                 }
             });
         }else{
+            // Add annotations on the workflow itself
             for(const annotation of annotations){
                 let fn;
                 switch(annotation.annotation_level){
@@ -69,12 +99,6 @@ async function run(): Promise<void> {
                 });
             }
         }
-
-        const results = mutations.mutations.mutation
-            .reduce((acc, val) => acc.process(val), new Summary());
-        
-        core.setOutput("killed", results.killed);
-        core.setOutput("survived", results.survived);
 
         if(summary){            
             await core.summary

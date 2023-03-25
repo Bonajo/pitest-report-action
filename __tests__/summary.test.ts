@@ -20,29 +20,38 @@ function createMutation(status: MutationStatus, mutatedClass: string = "class.Te
     };
 }
 
-test('summary should default to 0', async () => {
+test('summary should default to 0',  () => {
     const summary = new Summary();
     expect(summary.survived).toBe("0");
     expect(summary.killed).toBe("0");
 });
 
-test('process should increase', async () => {
+test('process should increase',  () => {
     const summary = new Summary();
     summary.process(createMutation("KILLED"));
     expect(summary.survived).toBe("0");
     expect(summary.killed).toBe("1");
 });
 
-test('process should increase', async () => {
+test('process should increase', () => {
     const summary = new Summary();
     summary.process(createMutation("SURVIVED"));
     expect(summary.survived).toBe("1");
     expect(summary.killed).toBe("0");
 });
 
-test('toSummaryTable should have every class as a row', async () => {
+test('toSummaryTable should have every class as a row', () => {
     const summary = new Summary();
     summary.process(createMutation("SURVIVED"));
     summary.process(createMutation("KILLED", "someother.TestClass"));
     expect(summary.toSummaryTable().length).toBe(4);
+});
+
+test('toSummaryMarkdown', () => {
+    const summary = new Summary();
+    summary.process(createMutation("SURVIVED"));
+    summary.process(createMutation("KILLED", "someother.TestClass"));
+    const markdown = summary.toSummaryMarkdown();
+    const lastRow = markdown.split("\n").pop();
+    expect(lastRow).toBe('| Total | 2 | 1 | 1 |');
 });
