@@ -3,29 +3,25 @@ on: [push]
 jobs:
   test-action:
     runs-on: ubuntu-latest
-    name: Test the pitest report action
+    name: Test pitest report action
+    strategy:
+      matrix:
+        node-version: ["16"]
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Set up JDK
-        uses: actions/setup-java@v3
+      - name: Setup Node
+        uses: actions/setup-node@v3
         with:
-          java-version: '17'
-          distribution: 'temurin'
-          cache: maven
-      - name: Test project
-        run: mvn -f testproject/pom.xml clean test
-      - name: Create Pitest report
-        run: mvn -f testproject/pom.xml test-compile org.pitest:pitest-maven:mutationCoverage -DoutputFormats=XML
-      - name: Publish pitest report
-        id: pitest
-        uses: ./
+          node-version: ${{ matrix.node-version }}
+      - name: Load cached node modules
+        id: cached-modules
+        uses: actions/cache@v3
         with:
-          file: 'testproject/**/mutations.xml'
-          output: checks
-          summary: true
-          annotation-types: SURVIVED
-          max-annotations: 15
-      - name: Check outputs
-        run: |
-          echo "KILLED: ${{ steps.pitest.outputs.killed }}, SURVIVED: ${{ steps.pitest.outputs.survived }}"
+          path: node_modules
+          key: modules${{ matrix.node-version }}-{{ $hashFiles('package-lock.json) }}
+      - name: Install dependencies
+        if: steps.cached-modules.outputs.cache-hit != 'true'
+        run: npm ci
+      - name: Run all tests
+        run: npm test
