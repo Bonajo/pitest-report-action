@@ -19,7 +19,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: node_modules
-          key: modules${{ matrix.node-version }}-{{ $hashFiles('package-lock.json) }}
+          key: modules-${{ matrix.node-version }}-{{ hashFiles('package-lock.json) }}
       - name: Install dependencies
         if: steps.cached-modules.outputs.cache-hit != 'true'
         run: npm ci
