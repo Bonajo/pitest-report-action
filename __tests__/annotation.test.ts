@@ -1,10 +1,11 @@
 import {expect, test} from "@jest/globals";
 import {createAnnotations} from "../src/annotation";
-import { Report } from "../src/report";
+import {Mutation, Report} from "../src/report";
 // @ts-ignore
-import testData from './testData.json';
+import mutationData from './mutationData.json';
 
-const report = <Report>testData;
+const mutations = <Mutation[]>(mutationData);
+const report = new Report("XML", "mutations.xml", mutations);
 
 test('createAnnotations for ALL', async () => {
     const annotations = createAnnotations(report, 50, "ALL");
@@ -30,9 +31,9 @@ test('createAnnotations should return valid annotations', async () => {
     // Should be valid according to: https://docs.github.com/en/rest/checks/runs?apiVersion=2022-11-28#create-a-check-run
 
     // Make a copy of the report
-    const longTitleReport: Report = JSON.parse(JSON.stringify(report));
+    const longTitleReport: Report = new Report("XML", "somedir/mutations.xml", mutations);
     // Set a long string as sourceFile, as this is used as part of the title of the annotation
-    longTitleReport.mutations.mutation[0].mutatedClass = "test".repeat(70);
+    longTitleReport.mutations[0].mutatedClass = "test".repeat(70);
     const annotations = createAnnotations(longTitleReport, 1, "ALL");
     expect(annotations[0].title?.length).toBe(255);
 });

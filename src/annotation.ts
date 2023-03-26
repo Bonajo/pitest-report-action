@@ -18,7 +18,7 @@ export function createAnnotations(
         report: Report,
         maxAnnotations: number,
         annotationType: AnnotationType): Annotation[] {
-    return report.mutations.mutation
+    return report.mutations
         .filter(m => annotationType === "ALL" || m.attr_status === annotationType)
         .slice(0, maxAnnotations)
         .map(m => {
@@ -27,7 +27,7 @@ export function createAnnotations(
                 start_line: m.lineNumber,
                 end_line: m.lineNumber,
                 annotation_level: m.attr_status === "KILLED" ? "notice" : "warning",
-                message: limitStringSize(m.description, 64*1024),
+                message: limitStringSize((!!m.description) ? m.description : m.mutator, 64*1024),
                 raw_details: limitStringSize(JSON.stringify(m, null, 2), 64*1024),
                 title: limitStringSize(`${m.attr_status} -> ${m.mutatedClass}:${m.mutatedMethod}`, 255)
             }

@@ -1,9 +1,9 @@
 import * as core from '@actions/core';
-
-import {getPath, parseMutationReport, readFile} from "./parser";
-import {createAnnotations, AnnotationType} from "./annotation";
 import * as github from '@actions/github';
-import {Summary} from "./summary";
+
+import { getPath, parseMutationReport } from "./parser";
+import { createAnnotations, AnnotationType } from "./annotation";
+import { Summary } from "./summary";
 
 async function run(): Promise<void> {
     try{
@@ -50,14 +50,13 @@ async function run(): Promise<void> {
 
         // Read the mutations.xml and parse to objects
         const path = await getPath(file);
-        const data = await readFile(path);
-        const mutations = parseMutationReport(data);
+        const mutations = await parseMutationReport(path);
 
         // Create the annotations
         const annotations = createAnnotations(mutations, maxAnnotations, annotationTypes);
 
         // Create summary
-        const results = mutations.mutations.mutation
+        const results = mutations.mutations
             .reduce((acc, val) => acc.process(val), new Summary());
 
         // Set outputs
