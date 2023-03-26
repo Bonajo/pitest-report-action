@@ -5,6 +5,9 @@ import { getPath, parseMutationReport } from "./parser";
 import { createAnnotations, AnnotationType } from "./annotation";
 import { Summary } from "./summary";
 
+/**
+ * Main method for the pitest report action
+ */
 async function run(): Promise<void> {
     try{
         // Read inputs

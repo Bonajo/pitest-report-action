@@ -2,6 +2,10 @@ import {MutationStatus, Report} from "./report";
 
 export type AnnotationType = "ALL" | MutationStatus;
 
+/**
+ * Annotation as defined by Check Run
+ * https://docs.github.com/en/rest/checks/runs?apiVersion=2022-11-28#create-a-check-run
+ */
 export interface Annotation {
     path: string
     start_line: number
@@ -14,6 +18,13 @@ export interface Annotation {
     raw_details?: string
 }
 
+/**
+ * Create Check Runs Annotation for every selected annotation
+ * @param report mutation report
+ * @param maxAnnotations max number of annotations to process
+ * @param annotationType which mutations to include
+ * @returns annotation[] annotations that can be used for Checks Run
+ */
 export function createAnnotations(
         report: Report,
         maxAnnotations: number,
@@ -35,6 +46,12 @@ export function createAnnotations(
         });
 }
 
+/**
+ * Helper method to cut off text at certain size and add three dots to indicate that there should be more text
+ * @param text the text to cut-off
+ * @param maxSize max size that the text may be
+ * @returns string cut-off at max size
+ */
 function limitStringSize(text: string, maxSize: number): string {
     return text.length <= maxSize ? text : text.substring(0, maxSize-3) + "...";
 }

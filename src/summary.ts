@@ -1,6 +1,9 @@
 import {Mutation} from "./report";
 import {SummaryTableRow} from "@actions/core/lib/summary";
 
+/**
+ * Helper class to keep track of statistics
+ */
 class SummaryStat {
     private _survived: number = 0;
     private _killed: number = 0;
@@ -26,10 +29,18 @@ class SummaryStat {
     }
 }
 
+/**
+ * Summary class to calculate statistics from mutations
+ */
 export class Summary {
     private stats = new Map<string, SummaryStat>();
     private readonly _total = new SummaryStat();
 
+    /**
+     * Process a mutation
+     * @param mutation the mutation to process
+     * @returns Summary this summary for fluent programming
+     */
     public process(mutation: Mutation): Summary {
         if(!this.stats.has(mutation.mutatedClass)){
             this.stats.set(mutation.mutatedClass, new SummaryStat());
@@ -45,18 +56,30 @@ export class Summary {
         return this;
     }
 
+    /**
+     * Get total number of killed mutations processed so far
+     */
     public get killed(): string {
         return this._total.killed;
     }
 
+    /**
+     * Get total number of survived mutations processed so far
+     */
     public get survived(): string {
         return this._total.survived;
     }
 
+    /**
+     * Get total number of mutations processed so far
+     */
     public get total(): string {
         return this._total.total;
     }
 
+    /**
+     * Convert this summary to a SummaryTable
+     */
     public toSummaryTable(): SummaryTableRow[]{
         const headers = [
             {data: 'Class', header: true},
@@ -72,6 +95,9 @@ export class Summary {
         return [headers, ...rows];
     }
 
+    /**
+     * Convert this summary to a Markdown table
+     */
     public toSummaryMarkdown(): string {
         const headers: string = '| Class | Mutations | KILLED | SURVIVED |';
         const separator: string = '| --- | --- | --- | --- |';

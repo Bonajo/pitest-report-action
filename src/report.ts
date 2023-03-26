@@ -1,5 +1,10 @@
+// A mutation is either KILLED or it SURVIVED
 export type MutationStatus = "KILLED" |"SURVIVED";
 
+/**
+ * Mutation as parsed by the XML parser
+ * Some fields are optional, as these are missing from the CSV mutation report
+ */
 export interface Mutation {
     sourceFile: string,
     mutatedClass: string
@@ -24,6 +29,9 @@ export interface XMLReport{
     mutations: XMLMutations
 }
 
+/**
+ * Class to unify different types of mutation reports
+ */
 export class Report {
     static readonly supportedTypes = ["XML", "CSV"];
     private readonly _type: typeof Report.supportedTypes[number];

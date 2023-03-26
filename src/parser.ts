@@ -6,6 +6,12 @@ import path from "node:path";
 import { parse } from "csv-parse";
 import {Mutation, MutationStatus, Report, XMLReport} from "./report";
 
+/**
+ * Get single path from glob
+ * @param pattern pattern to convert to path
+ * @returns Promise<string> single path that matched the glob
+ * @throws Error when no files match the pattern
+ */
 export async function getPath(pattern: string): Promise<string> {
     const globber = await glob.create(pattern);
     const files = await globber.glob();
@@ -18,10 +24,23 @@ export async function getPath(pattern: string): Promise<string> {
     return path.relative(process.cwd(), file);
 }
 
+/**
+ * Read file and return contents as string
+ * @param path to the file
+ * @returns Promise<string> the contents of the file
+ */
 export async function readFile(path: string): Promise<string> {
     return await fs.readFile(path, {encoding: 'utf8'});
 }
 
+/**
+ * Read and parse a mutation report and convert it to a Report class
+ * @param file the mutation report to read
+ * @returns Promise<Report> the parsed mutation report
+ * @throws Error if file doesn't exist
+ * @throws Error if the file has invalid extension
+ * @throws Error if the file cannot be parsed
+ */
 export async function parseMutationReport(file: string): Promise<Report> {
     const extension = path.extname(file).toUpperCase().substring(1);
     if(Report.supportedTypes.indexOf(extension) === -1){
@@ -39,6 +58,11 @@ export async function parseMutationReport(file: string): Promise<Report> {
     return new Report(extension, file, mutations);
 }
 
+/**
+ * Helper method to parse xml mutation report
+ * @param data the xml data as string
+ * @returns Mutation[] array containing parsed mutations
+ */
 function parseXMLReport(data: string): Mutation[] {
     const arrays = [
         "mutations.mutation",
@@ -57,6 +81,11 @@ function parseXMLReport(data: string): Mutation[] {
     return xmlReport.mutations.mutation;
 }
 
+/**
+ * Helper method to parse CSV mutation report
+ * @param data the csv data as string
+ * @returns Mutation[] array contained the parsed mutations
+ */
 function parseCSVReport(data: string): Mutation[]{
     const mutations: Mutation[] = [];
     const parser = parse({
