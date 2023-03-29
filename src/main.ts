@@ -38,6 +38,7 @@ async function run(): Promise<void> {
 
         // Create check run if needed
         if(output === "checks"){
+            core.info("Creating checks run");
             const checks = await octokit.rest.checks.create({
                 owner: github.context.repo.owner,
                 repo: github.context.repo.repo,
@@ -50,6 +51,7 @@ async function run(): Promise<void> {
                 }
             });
             checksId = checks.data.id;
+            core.info(`Checks run created with id: ${checksId}`);
         }
 
         // Read the mutations.xml and parse to objects
@@ -69,8 +71,9 @@ async function run(): Promise<void> {
 
         // Add the annotations
         if(output === "checks"){
+            core.info("Update the checks run...");
             // Update the checks run
-            await octokit.rest.checks.update({
+            const res = await octokit.rest.checks.update({
                 check_run_id: checksId,
                 owner: github.context.repo.owner,
                 repo: github.context.repo.repo,
@@ -82,6 +85,7 @@ async function run(): Promise<void> {
                     annotations: [...annotations]
                 }
             });
+            core.info(`Update checks run response: ${res.status}`)
         }else{
             // Add annotations on the workflow itself
             for(const annotation of annotations){

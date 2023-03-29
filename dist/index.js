@@ -14206,6 +14206,7 @@ function run() {
             }
             // Create check run if needed
             if (output === "checks") {
+                core.info("Creating checks run");
                 const checks = yield octokit.rest.checks.create({
                     owner: github.context.repo.owner,
                     repo: github.context.repo.repo,
@@ -14218,6 +14219,7 @@ function run() {
                     }
                 });
                 checksId = checks.data.id;
+                core.info(`Checks run created with id: ${checksId}`);
             }
             // Read the mutations.xml and parse to objects
             const path = yield (0, parser_1.getPath)(file);
@@ -14232,8 +14234,9 @@ function run() {
             core.setOutput("survived", results.survived);
             // Add the annotations
             if (output === "checks") {
+                core.info("Update the checks run...");
                 // Update the checks run
-                yield octokit.rest.checks.update({
+                const res = yield octokit.rest.checks.update({
                     check_run_id: checksId,
                     owner: github.context.repo.owner,
                     repo: github.context.repo.repo,
@@ -14245,6 +14248,7 @@ function run() {
                         annotations: [...annotations]
                     }
                 });
+                core.info(`Update checks run response: ${res.status}`);
             }
             else {
                 // Add annotations on the workflow itself
