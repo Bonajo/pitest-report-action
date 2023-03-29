@@ -14248,7 +14248,7 @@ function run() {
                         annotations: [...annotations]
                     }
                 });
-                core.info(`Update checks run response: ${res.status}`);
+                core.info(`Update checks run response: ${res.url}`);
             }
             else {
                 // Add annotations on the workflow itself
