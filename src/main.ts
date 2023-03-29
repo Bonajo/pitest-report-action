@@ -18,6 +18,7 @@ async function run(): Promise<void> {
         const maxAnnotations =  parseInt(core.getInput("max-annotations"), 10);
         const name = core.getInput("name");
         const token = core.getInput("token");
+        const threshold = parseInt(core.getInput("threshold"));
         const octokit = github.getOctokit(token);
         let checksId;
 
@@ -74,7 +75,7 @@ async function run(): Promise<void> {
                 owner: github.context.repo.owner,
                 repo: github.context.repo.repo,
                 status: 'completed',
-                conclusion: 'success',
+                conclusion: (results.strength < threshold) ? 'failure' : 'success',
                 output: {
                     title: name,
                     summary: results.toSummaryMarkdown(),

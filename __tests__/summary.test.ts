@@ -22,22 +22,22 @@ function createMutation(status: MutationStatus, mutatedClass: string = "class.Te
 
 test('summary should default to 0',  () => {
     const summary = new Summary();
-    expect(summary.survived).toBe("0");
-    expect(summary.killed).toBe("0");
+    expect(summary.survived).toBe(0);
+    expect(summary.killed).toBe(0);
 });
 
 test('process should increase',  () => {
     const summary = new Summary();
     summary.process(createMutation("KILLED"));
-    expect(summary.survived).toBe("0");
-    expect(summary.killed).toBe("1");
+    expect(summary.survived).toBe(0);
+    expect(summary.killed).toBe(1);
 });
 
 test('process should increase', () => {
     const summary = new Summary();
     summary.process(createMutation("SURVIVED"));
-    expect(summary.survived).toBe("1");
-    expect(summary.killed).toBe("0");
+    expect(summary.survived).toBe(1);
+    expect(summary.killed).toBe(0);
 });
 
 test('toSummaryTable should have every class as a row', () => {

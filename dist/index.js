@@ -14190,6 +14190,7 @@ function run() {
             const maxAnnotations = parseInt(core.getInput("max-annotations"), 10);
             const name = core.getInput("name");
             const token = core.getInput("token");
+            const threshold = parseInt(core.getInput("threshold"));
             const octokit = github.getOctokit(token);
             let checksId;
             // Validate inputs
@@ -14237,7 +14238,7 @@ function run() {
                     owner: github.context.repo.owner,
                     repo: github.context.repo.repo,
                     status: 'completed',
-                    conclusion: 'success',
+                    conclusion: (results.strength < threshold) ? 'failure' : 'success',
                     output: {
                         title: name,
                         summary: results.toSummaryMarkdown(),
@@ -14500,13 +14501,13 @@ class SummaryStat {
         this._killed = 0;
     }
     get survived() {
-        return this._survived.toString();
+        return this._survived;
     }
     get killed() {
-        return this._killed.toString();
+        return this._killed;
     }
     get total() {
-        return (this._killed + this._survived).toString();
+        return this.killed + this.survived;
     }
     increaseSurvived() {
         this._survived++;
@@ -14561,6 +14562,9 @@ class Summary {
     get total() {
         return this._total.total;
     }
+    get strength() {
+        return this._total.killed / this._total.total;
+    }
     /**
      * Convert this summary to a SummaryTable
      */
@@ -14572,8 +14576,8 @@ class Summary {
             { data: 'SURVIVED', header: true }
         ];
         const rows = Array.from(this.stats.entries())
-            .map(v => [v[0], v[1].total, v[1].killed, v[1].survived]);
-        rows.push(["Total", this.total, this.killed, this.survived]);
+            .map(v => [v[0], `${v[1].total}`, `${v[1].killed}`, `${v[1].survived}`]);
+        rows.push(["Total", `${this.total}`, `${this.killed}`, `${this.survived}`]);
         return [headers, ...rows];
     }
     /**

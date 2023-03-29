@@ -37,6 +37,5 @@ test('parseMutationReport should parse valid mutations.xml', async () => {
 
 test('parseMutationReport should parse valid mutations.csv', async () => {
    const report = await parseMutationReport("mutations.csv");
-   console.log(report.mutations);
    expect(report.mutations.length).toBe(11);
 })

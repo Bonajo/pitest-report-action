@@ -25,6 +25,10 @@ inputs:
     description: Limit the number of annotations that are generated (max 50)
     required: false
     default: 10
+  threshold:
+    description: Fail if the test-strength is below the threshold
+    required: false
+    default: 0
   token:
     description: GitHub Access Token
     required: false
