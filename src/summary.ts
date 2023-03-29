@@ -8,16 +8,16 @@ class SummaryStat {
     private _survived: number = 0;
     private _killed: number = 0;
 
-    get survived(): string {
-        return this._survived.toString();
+    get survived(): number {
+        return this._survived;
     }
 
-    get killed(): string {
-        return this._killed.toString();
+    get killed(): number {
+        return this._killed;
     }
 
-    get total(): string {
-        return (this._killed + this._survived).toString();
+    get total(): number {
+        return this.killed + this.survived;
     }
 
     public increaseSurvived(): void {
@@ -59,22 +59,26 @@ export class Summary {
     /**
      * Get total number of killed mutations processed so far
      */
-    public get killed(): string {
+    public get killed(): number {
         return this._total.killed;
     }
 
     /**
      * Get total number of survived mutations processed so far
      */
-    public get survived(): string {
+    public get survived(): number {
         return this._total.survived;
     }
 
     /**
      * Get total number of mutations processed so far
      */
-    public get total(): string {
+    public get total(): number {
         return this._total.total;
+    }
+
+    public get strength(): number {
+        return this._total.killed / this._total.total;
     }
 
     /**
@@ -88,9 +92,9 @@ export class Summary {
             {data: 'SURVIVED', header: true}
         ];
         const rows = Array.from(this.stats.entries())
-            .map(v => [v[0], v[1].total, v[1].killed, v[1].survived]);
+            .map(v => [v[0], `${v[1].total}`, `${v[1].killed}`, `${v[1].survived}`]);
 
-        rows.push(["Total", this.total, this.killed, this.survived])
+        rows.push(["Total", `${this.total}`, `${this.killed}`, `${this.survived}`]);
 
         return [headers, ...rows];
     }
