@@ -75,6 +75,8 @@ async function run(): Promise<void> {
         core.setOutput("killed", results.killed);
         core.setOutput("survived", results.survived);
 
+        const hasFailed = results.strength < threshold;
+
         // Add the annotations
         if(output === "checks"){
             core.info("Update the checks run...");
@@ -84,7 +86,7 @@ async function run(): Promise<void> {
                 owner: github.context.repo.owner,
                 repo: github.context.repo.repo,
                 status: 'completed',
-                conclusion: (results.strength < threshold) ? 'failure' : 'success',
+                conclusion: hasFailed ? 'failure' : 'success',
                 output: {
                     title: name,
                     summary: results.toSummaryMarkdown(),
@@ -118,6 +120,10 @@ async function run(): Promise<void> {
                 .addHeading("Pitest results")
                 .addTable(results.toSummaryTable())
                 .write();
+        }
+
+        if(hasFailed){
+            core.setFailed(`Threshold is not reached. Test strength: ${results.strength}`);
         }
 
     }catch(error){
