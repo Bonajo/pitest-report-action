@@ -14237,6 +14237,7 @@ function run() {
             // Set outputs
             core.setOutput("killed", results.killed);
             core.setOutput("survived", results.survived);
+            const hasFailed = results.strength < threshold;
             // Add the annotations
             if (output === "checks") {
                 core.info("Update the checks run...");
@@ -14246,7 +14247,7 @@ function run() {
                     owner: github.context.repo.owner,
                     repo: github.context.repo.repo,
                     status: 'completed',
-                    conclusion: (results.strength < threshold) ? 'failure' : 'success',
+                    conclusion: hasFailed ? 'failure' : 'success',
                     output: {
                         title: name,
                         summary: results.toSummaryMarkdown(),
@@ -14283,6 +14284,9 @@ function run() {
                     .addHeading("Pitest results")
                     .addTable(results.toSummaryTable())
                     .write();
+            }
+            if (hasFailed) {
+                core.setFailed(`Threshold is not reached. Test strength: ${results.strength}`);
             }
         }
         catch (error) {
