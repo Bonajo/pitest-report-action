@@ -14181,6 +14181,10 @@ const summary_1 = __nccwpck_require__(2553);
  */
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
+        let checksRunOngoing = false;
+        let token;
+        let octokit;
+        let checksId;
         try {
             // Read inputs
             const file = core.getInput("file");
@@ -14189,10 +14193,9 @@ function run() {
             const output = core.getInput("output");
             const maxAnnotations = parseInt(core.getInput("max-annotations"), 10);
             const name = core.getInput("name");
-            const token = core.getInput("token");
+            token = core.getInput("token");
             const threshold = parseInt(core.getInput("threshold"));
-            const octokit = github.getOctokit(token);
-            let checksId;
+            octokit = github.getOctokit(token);
             // Validate inputs
             if (!annotationsString || ['ALL', 'KILLED', 'SURVIVED'].indexOf(annotationsString) === -1) {
                 core.setFailed(`Annotations should be one of ALL, KILLED or SURVIVED, but was ${annotationsString}`);
@@ -14204,6 +14207,8 @@ function run() {
             if (!maxAnnotations || isNaN(maxAnnotations)) {
                 core.setFailed(`Max number of annotations should be a number and max of 50, but is ${maxAnnotations}`);
             }
+            // Get path to file
+            const path = yield (0, parser_1.getPath)(file);
             // Create check run if needed
             if (output === "checks") {
                 core.info("Creating checks run");
@@ -14220,9 +14225,9 @@ function run() {
                 });
                 checksId = checks.data.id;
                 core.info(`Checks run created with id: ${checksId}`);
+                checksRunOngoing = true;
             }
             // Read the mutations.xml and parse to objects
-            const path = yield (0, parser_1.getPath)(file);
             const mutations = yield (0, parser_1.parseMutationReport)(path);
             // Create the annotations
             const annotations = (0, annotation_1.createAnnotations)(mutations, maxAnnotations, annotationTypes);
@@ -14249,6 +14254,7 @@ function run() {
                     }
                 });
                 core.info(`Update checks run response: ${res.url}`);
+                checksRunOngoing = false;
             }
             else {
                 // Add annotations on the workflow itself
@@ -14280,8 +14286,28 @@ function run() {
             }
         }
         catch (error) {
+            let message;
             if (error instanceof Error) {
-                core.setFailed(error.message);
+                message = error.message;
+            }
+            else {
+                message = `${error}`;
+            }
+            core.setFailed(message);
+            if (checksRunOngoing) {
+                // If the checks run is started, octokit has to be defined
+                // @ts-ignore
+                yield octokit.rest.checks.update({
+                    check_run_id: checksId,
+                    owner: github.context.repo.owner,
+                    repo: github.context.repo.repo,
+                    status: 'completed',
+                    conclusion: 'failure',
+                    output: {
+                        title: 'Action failed',
+                        summary: message
+                    }
+                });
             }
         }
     });
@@ -14567,7 +14593,7 @@ class Summary {
         return this._total.total;
     }
     get strength() {
-        return this._total.killed / this._total.total;
+        return this._total.killed / this._total.total * 100;
     }
     /**
      * Convert this summary to a SummaryTable

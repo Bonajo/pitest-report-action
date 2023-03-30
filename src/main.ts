@@ -9,6 +9,10 @@ import { Summary } from "./summary";
  * Main method for the pitest report action
  */
 async function run(): Promise<void> {
+    let checksRunOngoing = false;
+    let token;
+    let octokit;
+    let checksId;
     try{
         // Read inputs
         const file = core.getInput("file");
@@ -17,10 +21,9 @@ async function run(): Promise<void> {
         const output = core.getInput("output");
         const maxAnnotations =  parseInt(core.getInput("max-annotations"), 10);
         const name = core.getInput("name");
-        const token = core.getInput("token");
+        token = core.getInput("token");
         const threshold = parseInt(core.getInput("threshold"));
-        const octokit = github.getOctokit(token);
-        let checksId;
+        octokit = github.getOctokit(token);
 
         // Validate inputs
         if(!annotationsString || ['ALL', 'KILLED', 'SURVIVED'].indexOf(annotationsString) === -1){
@@ -35,6 +38,9 @@ async function run(): Promise<void> {
         if(!maxAnnotations || isNaN(maxAnnotations)){
             core.setFailed(`Max number of annotations should be a number and max of 50, but is ${maxAnnotations}`);
         }
+
+        // Get path to file
+        const path = await getPath(file);
 
         // Create check run if needed
         if(output === "checks"){
@@ -52,10 +58,10 @@ async function run(): Promise<void> {
             });
             checksId = checks.data.id;
             core.info(`Checks run created with id: ${checksId}`);
+            checksRunOngoing = true;
         }
 
         // Read the mutations.xml and parse to objects
-        const path = await getPath(file);
         const mutations = await parseMutationReport(path);
 
         // Create the annotations
@@ -85,7 +91,8 @@ async function run(): Promise<void> {
                     annotations: [...annotations]
                 }
             });
-            core.info(`Update checks run response: ${res.url}`)
+            core.info(`Update checks run response: ${res.url}`);
+            checksRunOngoing = false;
         }else{
             // Add annotations on the workflow itself
             for(const annotation of annotations){
@@ -114,8 +121,27 @@ async function run(): Promise<void> {
         }
 
     }catch(error){
+        let message: string;
         if (error instanceof Error) {
-            core.setFailed(error.message);
+            message = error.message;
+        }else{
+            message = `${error}`;
+        }
+        core.setFailed(message);
+        if(checksRunOngoing){
+            // If the checks run is started, octokit has to be defined
+            // @ts-ignore
+            await octokit.rest.checks.update({
+                check_run_id: checksId,
+                owner: github.context.repo.owner,
+                repo: github.context.repo.repo,
+                status: 'completed',
+                conclusion: 'failure',
+                output: {
+                    title: 'Action failed',
+                    summary: message
+                }
+            });
         }
     }
 }
