@@ -55,3 +55,10 @@ test('toSummaryMarkdown', () => {
     const lastRow = markdown.split("\n").pop();
     expect(lastRow).toBe('| Total | 2 | 1 | 1 |');
 });
+
+test('strength', () => {
+    const summary = new Summary();
+    summary.process(createMutation("SURVIVED"));
+    summary.process(createMutation("KILLED", "someother.TestClass"));
+    expect(summary.strength).toBe(50);
+});

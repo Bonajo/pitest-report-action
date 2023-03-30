@@ -78,7 +78,7 @@ export class Summary {
     }
 
     public get strength(): number {
-        return this._total.killed / this._total.total;
+        return this._total.killed / this._total.total * 100;
     }
 
     /**

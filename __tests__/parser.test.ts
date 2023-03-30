@@ -3,6 +3,11 @@ import * as core from "@actions/core";
 
 import {expect, test, jest} from '@jest/globals';
 
+test('getPath should return valid path', async () => {
+   const path = await getPath("mutations.xml");
+   expect(path).toBe("mutations.xml");
+});
+
 test('readFile should read file', async () => {
    const data = await readFile('mutations.xml');
    const xml = data.startsWith("<?xml");
