@@ -4,6 +4,7 @@ import * as github from '@actions/github';
 import { getPath, parseMutationReport } from "./parser";
 import { createAnnotations, AnnotationType } from "./annotation";
 import { Summary } from "./summary";
+import {getCheckRunSha} from "./context";
 
 /**
  * Main method for the pitest report action
@@ -49,11 +50,12 @@ async function run(): Promise<void> {
                 owner: github.context.repo.owner,
                 repo: github.context.repo.repo,
                 name: name,
-                head_sha: github.context.sha,
+                head_sha: getCheckRunSha(),
                 status: 'in_progress',
+                started_at: new Date().toISOString(),
                 output: {
                     title: name,
-                    summary: ''
+                    summary: `${name} in progress...`
                 }
             });
             checksId = checks.data.id;
@@ -87,6 +89,7 @@ async function run(): Promise<void> {
                 repo: github.context.repo.repo,
                 status: 'completed',
                 conclusion: hasFailed ? 'failure' : 'success',
+                completed_at: new Date().toISOString(),
                 output: {
                     title: name,
                     summary: results.toSummaryMarkdown(),
@@ -143,6 +146,7 @@ async function run(): Promise<void> {
                 repo: github.context.repo.repo,
                 status: 'completed',
                 conclusion: 'failure',
+                completed_at: new Date().toISOString(),
                 output: {
                     title: 'Action failed',
                     summary: message
