@@ -1,4 +1,4 @@
-import { X2jOptionsOptional, XMLParser } from "fast-xml-parser";
+import { X2jOptions, XMLParser } from "fast-xml-parser";
 import * as glob from "@actions/glob";
 import * as core from "@actions/core";
 import fs from "fs/promises";
@@ -69,7 +69,7 @@ function parseXMLReport(data: string): Mutation[] {
         "mutations.mutation.indexes",
         "mutations.mutation.blocks"
     ]
-    const options: X2jOptionsOptional = {
+    const options: X2jOptions = {
         ignorePiTags: true,
         ignoreAttributes: false,
         parseAttributeValue: true,
