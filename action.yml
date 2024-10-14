@@ -12,7 +12,7 @@ inputs:
   summary:
     description: The results are published as part of the workflow summary
     required: false
-    default: true
+    default: 'true'
   annotation-types:
     description: Generate annotation for status (ALL, SURVIVED, KILLED)
     required: false
@@ -24,11 +24,11 @@ inputs:
   max-annotations:
     description: Limit the number of annotations that are generated (max 50)
     required: false
-    default: 10
+    default: '10'
   threshold:
     description: Fail if the test-strength is below the threshold
     required: false
-    default: 0
+    default: '0'
   token:
     description: GitHub Access Token
     required: false
@@ -39,7 +39,7 @@ outputs:
   survived:
     description: Total number of survived mutations
 runs:
-  using: 'node16'
+  using: 'node20'
   main: 'dist/index.js'
 branding:
   icon: 'sliders'
