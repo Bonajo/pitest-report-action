@@ -35,10 +35,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.parseMutationReport = exports.readFile = exports.getPath = void 0;
+exports.parseMutationReport = exports.readFile = exports.getPaths = void 0;
 const fast_xml_parser_1 = require("fast-xml-parser");
 const glob = __importStar(require("@actions/glob"));
-const core = __importStar(require("@actions/core"));
 const promises_1 = __importDefault(require("fs/promises"));
 const node_path_1 = __importDefault(require("node:path"));
 const csv_parse_1 = require("csv-parse");
@@ -49,21 +48,17 @@ const report_1 = require("./report");
  * @returns Promise<string> single path that matched the glob
  * @throws Error when no files match the pattern
  */
-function getPath(pattern) {
+function getPaths(pattern) {
     return __awaiter(this, void 0, void 0, function* () {
         const globber = yield glob.create(pattern);
         const files = yield globber.glob();
         if (files.length == 0) {
             throw new Error(`No matching file found for ${pattern}`);
         }
-        else if (files.length > 1) {
-            core.warning(`Action supports only one mutations.xml at a time, will only use ${files[0]}`);
-        }
-        const file = files[0];
-        return node_path_1.default.relative(process.cwd(), file);
+        return files.map(file => node_path_1.default.relative(process.cwd(), file));
     });
 }
-exports.getPath = getPath;
+exports.getPaths = getPaths;
 /**
  * Read file and return contents as string
  * @param path to the file

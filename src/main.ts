@@ -1,7 +1,7 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
 
-import { getPath, parseMutationReport } from "./parser";
+import { getPaths, parseMutationReport } from "./parser";
 import { createAnnotations, AnnotationType } from "./annotation";
 import { Summary } from "./summary";
 import {getCheckRunSha} from "./context";
@@ -41,7 +41,7 @@ async function run(): Promise<void> {
         }
 
         // Get path to file
-        const path = await getPath(file);
+        const paths = await getPaths(file);
 
         // Create check run if needed
         if(output === "checks"){
@@ -64,14 +64,15 @@ async function run(): Promise<void> {
         }
 
         // Read the mutations.xml and parse to objects
-        const mutations = await parseMutationReport(path);
+        const reports = await Promise.all(paths.map(path => parseMutationReport(path)));
 
         // Create the annotations
-        const annotations = createAnnotations(mutations, maxAnnotations, annotationTypes);
+        const annotations = createAnnotations(reports, maxAnnotations, annotationTypes);
 
         // Create summary
-        const results = mutations.mutations
-            .reduce((acc, val) => acc.process(val), new Summary());
+        const results = reports
+                            .flatMap(report => report.mutations)
+                            .reduce((acc, val) => acc.process(val), new Summary());
 
         // Set outputs
         core.setOutput("killed", results.killed);

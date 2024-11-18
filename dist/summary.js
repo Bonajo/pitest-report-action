@@ -10,13 +10,13 @@ class SummaryStat {
         this._killed = 0;
     }
     get survived() {
-        return this._survived.toString();
+        return this._survived;
     }
     get killed() {
-        return this._killed.toString();
+        return this._killed;
     }
     get total() {
-        return (this._killed + this._survived).toString();
+        return this.killed + this.survived;
     }
     increaseSurvived() {
         this._survived++;
@@ -36,7 +36,7 @@ class Summary {
     /**
      * Process a mutation
      * @param mutation the mutation to process
-     * @returns Summary this summary for fluent programming
+     * @returns Summary for fluent programming
      */
     process(mutation) {
         if (!this.stats.has(mutation.mutatedClass)) {
@@ -71,6 +71,9 @@ class Summary {
     get total() {
         return this._total.total;
     }
+    get strength() {
+        return this._total.killed / this._total.total * 100;
+    }
     /**
      * Convert this summary to a SummaryTable
      */
@@ -82,8 +85,8 @@ class Summary {
             { data: 'SURVIVED', header: true }
         ];
         const rows = Array.from(this.stats.entries())
-            .map(v => [v[0], v[1].total, v[1].killed, v[1].survived]);
-        rows.push(["Total", this.total, this.killed, this.survived]);
+            .map(v => [v[0], `${v[1].total}`, `${v[1].killed}`, `${v[1].survived}`]);
+        rows.push(["Total", `${this.total}`, `${this.killed}`, `${this.survived}`]);
         return [headers, ...rows];
     }
     /**

@@ -39,7 +39,7 @@ export class Summary {
     /**
      * Process a mutation
      * @param mutation the mutation to process
-     * @returns Summary this summary for fluent programming
+     * @returns Summary for fluent programming
      */
     public process(mutation: Mutation): Summary {
         if(!this.stats.has(mutation.mutatedClass)){

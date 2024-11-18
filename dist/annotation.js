@@ -8,11 +8,12 @@ exports.createAnnotations = void 0;
  * @param annotationType which mutations to include
  * @returns annotation[] annotations that can be used for Checks Run
  */
-function createAnnotations(report, maxAnnotations, annotationType) {
-    return report.mutations
+function createAnnotations(reports, maxAnnotations, annotationType) {
+    let annotations = [];
+    reports.map(report => report.mutations
         .filter(m => annotationType === "ALL" || m.attr_status === annotationType)
-        .slice(0, maxAnnotations)
-        .map(m => {
+        .slice(0, Math.max(maxAnnotations - annotations.length, 0))
+        .forEach(m => {
         const annotation = {
             path: m.mutatedClass,
             start_line: m.lineNumber,
@@ -22,8 +23,9 @@ function createAnnotations(report, maxAnnotations, annotationType) {
             raw_details: limitStringSize(JSON.stringify(m, null, 2), 64 * 1024),
             title: limitStringSize(`${m.attr_status} -> ${m.mutatedClass}:${m.mutatedMethod}`, 255)
         };
-        return annotation;
-    });
+        annotations.push(annotation);
+    }));
+    return annotations;
 }
 exports.createAnnotations = createAnnotations;
 /**

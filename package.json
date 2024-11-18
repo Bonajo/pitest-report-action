@@ -1,6 +1,6 @@
 {
   "name": "pitest-report-action",
-  "version": "0.0.1",
+  "version": "0.8.0",
   "description": "Publish pitest reports from GitHub Action",
   "main": "dist/main.js",
   "scripts": {
