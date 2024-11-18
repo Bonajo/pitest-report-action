@@ -10,7 +10,7 @@ Add the Action to the workflow, basic example can be found below.
 
 ```yaml
 - name: Publish Pitest Report
-  uses: Bonajo/pitest-report-action@v0.5
+  uses: Bonajo/pitest-report-action@v0.8
   with:
     file: target/pit-reports/mutations.xml
 ```
