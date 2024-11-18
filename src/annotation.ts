@@ -26,24 +26,29 @@ export interface Annotation {
  * @returns annotation[] annotations that can be used for Checks Run
  */
 export function createAnnotations(
-        report: Report,
+        reports: Report[],
         maxAnnotations: number,
         annotationType: AnnotationType): Annotation[] {
-    return report.mutations
-        .filter(m => annotationType === "ALL" || m.attr_status === annotationType)
-        .slice(0, maxAnnotations)
-        .map(m => {
-            const annotation: Annotation = {
-                path: m.mutatedClass,
-                start_line: m.lineNumber,
-                end_line: m.lineNumber,
-                annotation_level: m.attr_status === "KILLED" ? "notice" : "warning",
-                message: limitStringSize((!!m.description) ? m.description : m.mutator, 64*1024),
-                raw_details: limitStringSize(JSON.stringify(m, null, 2), 64*1024),
-                title: limitStringSize(`${m.attr_status} -> ${m.mutatedClass}:${m.mutatedMethod}`, 255)
-            }
-            return annotation;
-        });
+    
+    let annotations: Annotation[] = []; 
+    reports.map(report => 
+        report.mutations
+            .filter(m => annotationType === "ALL" || m.attr_status === annotationType)
+            .slice(0, Math.max(maxAnnotations - annotations.length, 0))
+            .forEach(m => {
+                const annotation: Annotation = {
+                    path: m.mutatedClass,
+                    start_line: m.lineNumber,
+                    end_line: m.lineNumber,
+                    annotation_level: m.attr_status === "KILLED" ? "notice" : "warning",
+                    message: limitStringSize((!!m.description) ? m.description : m.mutator, 64*1024),
+                    raw_details: limitStringSize(JSON.stringify(m, null, 2), 64*1024),
+                    title: limitStringSize(`${m.attr_status} -> ${m.mutatedClass}:${m.mutatedMethod}`, 255)
+                }
+                annotations.push(annotation);
+            })
+        );
+    return annotations;
 }
 
 /**

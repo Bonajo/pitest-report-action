@@ -1,6 +1,5 @@
 import { X2jOptions, XMLParser } from "fast-xml-parser";
 import * as glob from "@actions/glob";
-import * as core from "@actions/core";
 import fs from "fs/promises";
 import path from "node:path";
 import { parse } from "csv-parse";
@@ -12,16 +11,13 @@ import {Mutation, MutationStatus, Report, XMLReport} from "./report";
  * @returns Promise<string> single path that matched the glob
  * @throws Error when no files match the pattern
  */
-export async function getPath(pattern: string): Promise<string> {
+export async function getPaths(pattern: string): Promise<string[]> {
     const globber = await glob.create(pattern);
     const files = await globber.glob();
     if(files.length == 0){
         throw new Error(`No matching file found for ${pattern}`);
-    }else if(files.length > 1){
-        core.warning(`Action supports only one mutations.xml at a time, will only use ${files[0]}`);
     }
-    const file = files[0];
-    return path.relative(process.cwd(), file);
+    return files.map(file => path.relative(process.cwd(), file));
 }
 
 /**

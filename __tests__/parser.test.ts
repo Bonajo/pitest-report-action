@@ -1,11 +1,11 @@
-import {getPath, parseMutationReport, readFile} from '../src/parser';
-import * as core from "@actions/core";
+import {getPaths, parseMutationReport, readFile} from '../src/parser';
 
-import {expect, test, jest} from '@jest/globals';
+import {expect, test} from '@jest/globals';
 
 test('getPath should return valid path', async () => {
-   const path = await getPath("mutations.xml");
-   expect(path).toBe("mutations.xml");
+   const paths = await getPaths("mutations.xml");
+   expect(paths.length).toBe(1);
+   expect(paths[0]).toBe("mutations.xml");
 });
 
 test('readFile should read file', async () => {
@@ -15,20 +15,13 @@ test('readFile should read file', async () => {
 });
 
 test('getPath unknown file should throw error', async () => {
-   await expect(getPath('test.xml')).rejects.toThrow("No matching file");
+   await expect(getPaths('test.xml')).rejects.toThrow("No matching file");
 });
 
-test('getPath with multiple matched files should warn', async () => {
-   jest.spyOn(core, 'warning').mockImplementation(jest.fn())
-   try{
-      await getPath("*.json");
-   }catch(ignored){  }
-   expect(core.warning).toBeCalled();
-});
-
-test('getPath should work for valid file', async () => {
-   const path = await getPath('mutations.xml');
-   await expect(path).toBe("mutations.xml");
+test('getPaths with multiple matched files', async () => {
+   let paths = await getPaths("*.json");
+   expect(paths).not.toBe(undefined);
+   expect(paths.length).toBe(3);
 });
 
 test('getPath with non valid extension should throw', async () => {

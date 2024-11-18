@@ -5,25 +5,25 @@ import {Mutation, Report} from "../src/report";
 import mutationData from './mutationData.json';
 
 const mutations = <Mutation[]>(mutationData);
-const report = new Report("XML", "mutations.xml", mutations);
+const reports = [new Report("XML", "mutations.xml", mutations)];
 
 test('createAnnotations for ALL', async () => {
-    const annotations = createAnnotations(report, 50, "ALL");
+    const annotations = createAnnotations(reports, 50, "ALL");
     expect(annotations.length).toBe(11);
 });
 
 test('createAnnotations for SURVIVED', async () => {
-    const annotations = createAnnotations(report, 50, "SURVIVED");
+    const annotations = createAnnotations(reports, 50, "SURVIVED");
     expect(annotations.length).toBe(1);
 });
 
 test('createAnnotations for KILLED', async () => {
-    const annotations = createAnnotations(report, 50, "KILLED");
+    const annotations = createAnnotations(reports, 50, "KILLED");
     expect(annotations.length).toBe(10);
 });
 
 test('createAnnotations should limit annotations to maxAnnotations', async () => {
-    const annotations = createAnnotations(report, 5, "ALL");
+    const annotations = createAnnotations(reports, 5, "ALL");
     expect(annotations.length).toBe(5);
 });
 
@@ -34,6 +34,6 @@ test('createAnnotations should return valid annotations', async () => {
     const longTitleReport: Report = new Report("XML", "somedir/mutations.xml", mutations);
     // Set a long string as sourceFile, as this is used as part of the title of the annotation
     longTitleReport.mutations[0].mutatedClass = "test".repeat(70);
-    const annotations = createAnnotations(longTitleReport, 1, "ALL");
+    const annotations = createAnnotations([longTitleReport], 1, "ALL");
     expect(annotations[0].title?.length).toBe(255);
 });
