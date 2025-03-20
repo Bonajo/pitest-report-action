@@ -27,13 +27,18 @@ test('createAnnotations should limit annotations to maxAnnotations', async () =>
     expect(annotations.length).toBe(5);
 });
 
+test('createAnnotations for empty mutations.xml', async () => {
+    const annotations = createAnnotations([new Report("XML", "mutations.xml", undefined)], 5, "ALL");
+    expect(annotations.length).toBe(0);
+});
+
 test('createAnnotations should return valid annotations', async () => {
     // Should be valid according to: https://docs.github.com/en/rest/checks/runs?apiVersion=2022-11-28#create-a-check-run
 
     // Make a copy of the report
     const longTitleReport: Report = new Report("XML", "somedir/mutations.xml", mutations);
     // Set a long string as sourceFile, as this is used as part of the title of the annotation
-    longTitleReport.mutations[0].mutatedClass = "test".repeat(70);
+    longTitleReport.mutations!![0].mutatedClass = "test".repeat(70);
     const annotations = createAnnotations([longTitleReport], 1, "ALL");
     expect(annotations[0].title?.length).toBe(255);
 });

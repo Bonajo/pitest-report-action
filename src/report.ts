@@ -36,9 +36,9 @@ export class Report {
     static readonly supportedTypes = ["XML", "CSV"];
     private readonly _type: typeof Report.supportedTypes[number];
     private readonly _path: string;
-    private readonly _mutations: Array<Mutation>;
+    private readonly _mutations: Array<Mutation> | undefined;
 
-    public constructor(type: string, path: string, mutations: Mutation[]) {
+    public constructor(type: string, path: string, mutations: Mutation[] | undefined) {
         this._type = type;
         this._path = path;
         this._mutations = mutations;
@@ -52,7 +52,7 @@ export class Report {
         return this._path;
     }
 
-    public get mutations(): Mutation[] {
+    public get mutations(): Mutation[] | undefined {
         return this._mutations;
     }
 }

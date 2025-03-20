@@ -39,6 +39,9 @@ class Summary {
      * @returns Summary for fluent programming
      */
     process(mutation) {
+        if (!mutation) {
+            return this;
+        }
         if (!this.stats.has(mutation.mutatedClass)) {
             this.stats.set(mutation.mutatedClass, new SummaryStat());
         }

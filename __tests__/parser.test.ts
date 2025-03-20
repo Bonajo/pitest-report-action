@@ -30,10 +30,10 @@ test('getPath with non valid extension should throw', async () => {
 
 test('parseMutationReport should parse valid mutations.xml', async () => {
    const report = await parseMutationReport("mutations.xml");
-   expect(report.mutations.length).toBe(11);
+   expect(report.mutations!!.length).toBe(11);
 })
 
 test('parseMutationReport should parse valid mutations.csv', async () => {
    const report = await parseMutationReport("mutations.csv");
-   expect(report.mutations.length).toBe(11);
+   expect(report.mutations!!.length).toBe(11);
 })

@@ -60,5 +60,6 @@ test('strength', () => {
     const summary = new Summary();
     summary.process(createMutation("SURVIVED"));
     summary.process(createMutation("KILLED", "someother.TestClass"));
+    summary.process(undefined);
     expect(summary.strength).toBe(50);
 });

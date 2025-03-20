@@ -33,7 +33,7 @@ export function createAnnotations(
     let annotations: Annotation[] = []; 
     reports.map(report => 
         report.mutations
-            .filter(m => annotationType === "ALL" || m.attr_status === annotationType)
+            ?.filter(m => annotationType === "ALL" || m.attr_status === annotationType)
             .slice(0, Math.max(maxAnnotations - annotations.length, 0))
             .forEach(m => {
                 const annotation: Annotation = {

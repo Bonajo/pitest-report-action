@@ -10,21 +10,21 @@ exports.createAnnotations = void 0;
  */
 function createAnnotations(reports, maxAnnotations, annotationType) {
     let annotations = [];
-    reports.map(report => report.mutations
-        .filter(m => annotationType === "ALL" || m.attr_status === annotationType)
-        .slice(0, Math.max(maxAnnotations - annotations.length, 0))
-        .forEach(m => {
-        const annotation = {
-            path: m.mutatedClass,
-            start_line: m.lineNumber,
-            end_line: m.lineNumber,
-            annotation_level: m.attr_status === "KILLED" ? "notice" : "warning",
-            message: limitStringSize((!!m.description) ? m.description : m.mutator, 64 * 1024),
-            raw_details: limitStringSize(JSON.stringify(m, null, 2), 64 * 1024),
-            title: limitStringSize(`${m.attr_status} -> ${m.mutatedClass}:${m.mutatedMethod}`, 255)
-        };
-        annotations.push(annotation);
-    }));
+    reports.map(report => {
+        var _a;
+        return (_a = report.mutations) === null || _a === void 0 ? void 0 : _a.filter(m => annotationType === "ALL" || m.attr_status === annotationType).slice(0, Math.max(maxAnnotations - annotations.length, 0)).forEach(m => {
+            const annotation = {
+                path: m.mutatedClass,
+                start_line: m.lineNumber,
+                end_line: m.lineNumber,
+                annotation_level: m.attr_status === "KILLED" ? "notice" : "warning",
+                message: limitStringSize((!!m.description) ? m.description : m.mutator, 64 * 1024),
+                raw_details: limitStringSize(JSON.stringify(m, null, 2), 64 * 1024),
+                title: limitStringSize(`${m.attr_status} -> ${m.mutatedClass}:${m.mutatedMethod}`, 255)
+            };
+            annotations.push(annotation);
+        });
+    });
     return annotations;
 }
 exports.createAnnotations = createAnnotations;

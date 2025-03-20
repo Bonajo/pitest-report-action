@@ -41,7 +41,10 @@ export class Summary {
      * @param mutation the mutation to process
      * @returns Summary for fluent programming
      */
-    public process(mutation: Mutation): Summary {
+    public process(mutation: Mutation | undefined): Summary {
+        if(!mutation){
+            return this;
+        }
         if(!this.stats.has(mutation.mutatedClass)){
             this.stats.set(mutation.mutatedClass, new SummaryStat());
         }
