@@ -32,11 +32,11 @@ async function run(): Promise<void> {
         }
         const annotationTypes = <AnnotationType>annotationsString;
 
-        if(output !== "checks" && output !== "summary"){
-            core.setFailed(`Ouput should either be 'check' or 'summary', but is ${output}`);
+        if(output !== "checks" && output !== "workflow"){
+            core.setFailed(`Output should either be 'check' or 'workflow', but is ${output}`);
         }
 
-        if(!maxAnnotations || isNaN(maxAnnotations)){
+        if(!maxAnnotations || isNaN(maxAnnotations) || maxAnnotations > 50){
             core.setFailed(`Max number of annotations should be a number and max of 50, but is ${maxAnnotations}`);
         }
 
