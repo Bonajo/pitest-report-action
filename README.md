@@ -10,7 +10,7 @@ Add the Action to the workflow, basic example can be found below.
 
 ```yaml
 - name: Publish Pitest Report
-  uses: Bonajo/pitest-report-action@v0.8
+  uses: Bonajo/pitest-report-action@v1.0.0
   with:
     file: target/pit-reports/mutations.xml
 ```
@@ -36,9 +36,13 @@ annotation-types:
   required: false
   default: SURVIVED
 output:
-  description: Output location of the annotations (checks, summary)
+  description: Output location of the annotations (checks, workflow)
   required: false
   default: checks
+threshold:
+  description: Fail if the test-strength is below the threshold
+  required: false
+  default: '0'
 max-annotations:
   description: Limit the number of annotations that are generated (max 50)
   required: false
@@ -51,7 +55,7 @@ token:
 
 ## Outputs
 
-The Actions has the following outputs on successful run:
+The action has the following outputs on successful run:
 ```yaml
 killed:
   description: Total number of killed mutations

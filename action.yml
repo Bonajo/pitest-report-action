@@ -6,7 +6,7 @@ inputs:
     required: false
     default: Pitest report
   file:
-    description: Pitest report file (only supports xml)
+    description: Pitest report file (XML, CSV)
     required: false
     default: '**/pit-reports/mutations.xml'
   summary:
@@ -18,7 +18,7 @@ inputs:
     required: false
     default: SURVIVED
   output:
-    description: Output location of the annotations (checks, summary)
+    description: Output location of the annotations (checks, workflow)
     required: false
     default: checks
   max-annotations:

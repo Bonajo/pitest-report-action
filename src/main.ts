@@ -32,11 +32,11 @@ async function run(): Promise<void> {
         }
         const annotationTypes = <AnnotationType>annotationsString;
 
-        if(output !== "checks" && output !== "summary"){
-            core.setFailed(`Ouput should either be 'check' or 'summary', but is ${output}`);
+        if(output !== "checks" && output !== "workflow"){
+            core.setFailed(`Output should either be 'check' or 'workflow', but is ${output}`);
         }
 
-        if(!maxAnnotations || isNaN(maxAnnotations)){
+        if(!maxAnnotations || isNaN(maxAnnotations) || maxAnnotations > 50){
             core.setFailed(`Max number of annotations should be a number and max of 50, but is ${maxAnnotations}`);
         }
 
@@ -81,7 +81,7 @@ async function run(): Promise<void> {
         const hasFailed = results.strength < threshold;
 
         // Add the annotations
-        if(output === "checks"){
+        if(output === "checks" && typeof checksId == "number"){
             core.info("Update the checks run...");
             // Update the checks run
             const res = await octokit.rest.checks.update({
@@ -139,12 +139,14 @@ async function run(): Promise<void> {
         }
         core.setFailed(message);
         if(checksRunOngoing){
-            // If the checks run is started, octokit has to be defined
+            // If the checks run is started, octokit and checksId have to be defined
             // @ts-ignore
             await octokit.rest.checks.update({
+                // @ts-ignore
                 check_run_id: checksId,
                 owner: github.context.repo.owner,
                 repo: github.context.repo.repo,
+                // @ts-ignore
                 status: 'completed',
                 conclusion: 'failure',
                 completed_at: new Date().toISOString(),
