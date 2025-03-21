@@ -14197,7 +14197,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.createAnnotations = void 0;
 /**
  * Create Check Runs Annotation for every selected annotation
- * @param report mutation report
+ * @param reports array of reports
  * @param maxAnnotations max number of annotations to process
  * @param annotationType which mutations to include
  * @returns annotation[] annotations that can be used for Checks Run
@@ -14589,6 +14589,17 @@ function parseMutationReport(file) {
 }
 exports.parseMutationReport = parseMutationReport;
 /**
+ * Check if the mutations field of the XMLReport is actually of type XMLMutations
+ * @param obj
+ * @returns boolean true if obj instanceof XMLMutations
+ */
+function isXMLMutations(obj) {
+    return typeof obj === "object" &&
+        obj !== null &&
+        "mutation" in obj &&
+        Array.isArray(obj.mutation);
+}
+/**
  * Helper method to parse xml mutation report
  * @param data the xml data as string
  * @returns Mutation[] array containing parsed mutations
@@ -14608,6 +14619,10 @@ function parseXMLReport(data) {
     };
     const parser = new fast_xml_parser_1.XMLParser(options);
     const xmlReport = parser.parse(data);
+    // If not valid XMLMutations (e.g. empty mutations is parsed as empty string "")
+    if (!isXMLMutations(xmlReport.mutations)) {
+        return [];
+    }
     return xmlReport.mutations.mutation;
 }
 /**
@@ -14755,6 +14770,9 @@ class Summary {
         return this._total.total;
     }
     get strength() {
+        if (this._total.total === 0) {
+            return 0;
+        }
         return this._total.killed / this._total.total * 100;
     }
     /**
