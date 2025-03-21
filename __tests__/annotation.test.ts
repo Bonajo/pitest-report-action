@@ -37,3 +37,8 @@ test('createAnnotations should return valid annotations', async () => {
     const annotations = createAnnotations([longTitleReport], 1, "ALL");
     expect(annotations[0].title?.length).toBe(255);
 });
+
+test('createAnnotations for empty mutations.xml', async () => {
+    const annotations = createAnnotations([new Report("XML", "mutations.xml", [])], 5, "ALL");
+    expect(annotations.length).toBe(0);
+});

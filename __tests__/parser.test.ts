@@ -33,7 +33,17 @@ test('parseMutationReport should parse valid mutations.xml', async () => {
    expect(report.mutations.length).toBe(11);
 })
 
+test('parseMutationReport should parse empty mutations.xml', async () => {
+   const report = await parseMutationReport("empty.xml");
+   expect(report.mutations.length).toBe(0);
+})
+
 test('parseMutationReport should parse valid mutations.csv', async () => {
    const report = await parseMutationReport("mutations.csv");
    expect(report.mutations.length).toBe(11);
+})
+
+test('parseMutationReport should parse empty mutations.csv', async () => {
+   const report = await parseMutationReport("empty.csv");
+   expect(report.mutations.length).toBe(0);
 })

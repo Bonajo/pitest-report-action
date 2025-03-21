@@ -3,7 +3,7 @@ import * as glob from "@actions/glob";
 import fs from "fs/promises";
 import path from "node:path";
 import { parse } from "csv-parse";
-import {Mutation, MutationStatus, Report, XMLReport} from "./report";
+import {Mutation, MutationStatus, Report, XMLMutations, XMLReport} from "./report";
 
 /**
  * Get single path from glob
@@ -55,6 +55,18 @@ export async function parseMutationReport(file: string): Promise<Report> {
 }
 
 /**
+ * Check if the mutations field of the XMLReport is actually of type XMLMutations
+ * @param obj
+ * @returns boolean true if obj instanceof XMLMutations
+ */
+function isXMLMutations(obj: any): obj is XMLMutations {
+    return typeof obj === "object" &&
+        obj !== null &&
+        "mutation" in obj &&
+        Array.isArray(obj.mutation);
+}
+
+/**
  * Helper method to parse xml mutation report
  * @param data the xml data as string
  * @returns Mutation[] array containing parsed mutations
@@ -74,6 +86,10 @@ function parseXMLReport(data: string): Mutation[] {
     }
     const parser = new XMLParser(options);
     const xmlReport: XMLReport = parser.parse(data);
+    // If not valid XMLMutations (e.g. empty mutations is parsed as empty string "")
+    if(!isXMLMutations(xmlReport.mutations)) {
+        return [];
+    }
     return xmlReport.mutations.mutation;
 }
 

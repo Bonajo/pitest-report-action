@@ -78,6 +78,9 @@ export class Summary {
     }
 
     public get strength(): number {
+        if(this._total.total === 0) {
+            return 0;
+        }
         return this._total.killed / this._total.total * 100;
     }
 

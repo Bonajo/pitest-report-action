@@ -24,6 +24,7 @@ test('summary should default to 0',  () => {
     const summary = new Summary();
     expect(summary.survived).toBe(0);
     expect(summary.killed).toBe(0);
+    expect(summary.strength).toBe(0);
 });
 
 test('process should increase',  () => {
