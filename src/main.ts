@@ -81,7 +81,7 @@ async function run(): Promise<void> {
         const hasFailed = results.strength < threshold;
 
         // Add the annotations
-        if(output === "checks"){
+        if(output === "checks" && typeof checksId == "number"){
             core.info("Update the checks run...");
             // Update the checks run
             const res = await octokit.rest.checks.update({
@@ -139,12 +139,14 @@ async function run(): Promise<void> {
         }
         core.setFailed(message);
         if(checksRunOngoing){
-            // If the checks run is started, octokit has to be defined
+            // If the checks run is started, octokit and checksId have to be defined
             // @ts-ignore
             await octokit.rest.checks.update({
+                // @ts-ignore
                 check_run_id: checksId,
                 owner: github.context.repo.owner,
                 repo: github.context.repo.repo,
+                // @ts-ignore
                 status: 'completed',
                 conclusion: 'failure',
                 completed_at: new Date().toISOString(),
