@@ -20,7 +20,7 @@ export interface Annotation {
 
 /**
  * Create Check Runs Annotation for every selected annotation
- * @param report mutation report
+ * @param reports array of reports
  * @param maxAnnotations max number of annotations to process
  * @param annotationType which mutations to include
  * @returns annotation[] annotations that can be used for Checks Run
