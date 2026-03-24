@@ -25,3 +25,11 @@ jobs:
         run: npm ci
       - name: Run all tests
         run: npm test
+      - name: Check dist is up to date
+        run: |
+          npm run package
+          if [ -n "$(git status --porcelain dist/)" ]; then
+            echo "dist/ is out of date. Run 'npm run package' and commit the result."
+            git diff dist/
+            exit 1
+          fi
