@@ -39,7 +39,7 @@ outputs:
   survived:
     description: Total number of survived mutations
 runs:
-  using: 'node20'
+  using: 'node24'
   main: 'dist/index.js'
 branding:
   icon: 'sliders'
