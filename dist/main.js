@@ -15,13 +15,23 @@ var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (
 }) : function(o, v) {
     o["default"] = v;
 });
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -63,10 +73,10 @@ function run() {
                 core.setFailed(`Annotations should be one of ALL, KILLED or SURVIVED, but was ${annotationsString}`);
             }
             const annotationTypes = annotationsString;
-            if (output !== "checks" && output !== "summary") {
-                core.setFailed(`Ouput should either be 'check' or 'summary', but is ${output}`);
+            if (output !== "checks" && output !== "workflow") {
+                core.setFailed(`Output should either be 'check' or 'workflow', but is ${output}`);
             }
-            if (!maxAnnotations || isNaN(maxAnnotations)) {
+            if (!maxAnnotations || isNaN(maxAnnotations) || maxAnnotations > 50) {
                 core.setFailed(`Max number of annotations should be a number and max of 50, but is ${maxAnnotations}`);
             }
             // Get path to file
@@ -103,7 +113,7 @@ function run() {
             core.setOutput("survived", results.survived);
             const hasFailed = results.strength < threshold;
             // Add the annotations
-            if (output === "checks") {
+            if (output === "checks" && typeof checksId == "number") {
                 core.info("Update the checks run...");
                 // Update the checks run
                 const res = yield octokit.rest.checks.update({
@@ -164,12 +174,14 @@ function run() {
             }
             core.setFailed(message);
             if (checksRunOngoing) {
-                // If the checks run is started, octokit has to be defined
+                // If the checks run is started, octokit and checksId have to be defined
                 // @ts-ignore
                 yield octokit.rest.checks.update({
+                    // @ts-ignore
                     check_run_id: checksId,
                     owner: github.context.repo.owner,
                     repo: github.context.repo.repo,
+                    // @ts-ignore
                     status: 'completed',
                     conclusion: 'failure',
                     completed_at: new Date().toISOString(),

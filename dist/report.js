@@ -20,5 +20,5 @@ class Report {
         return this._mutations;
     }
 }
-Report.supportedTypes = ["XML", "CSV"];
 exports.Report = Report;
+Report.supportedTypes = ["XML", "CSV"];

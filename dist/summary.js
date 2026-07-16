@@ -72,6 +72,9 @@ class Summary {
         return this._total.total;
     }
     get strength() {
+        if (this._total.total === 0) {
+            return 0;
+        }
         return this._total.killed / this._total.total * 100;
     }
     /**
