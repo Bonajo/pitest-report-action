@@ -1,9 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createAnnotations = void 0;
+exports.createAnnotations = createAnnotations;
 /**
  * Create Check Runs Annotation for every selected annotation
- * @param report mutation report
+ * @param reports array of reports
  * @param maxAnnotations max number of annotations to process
  * @param annotationType which mutations to include
  * @returns annotation[] annotations that can be used for Checks Run
@@ -27,7 +27,6 @@ function createAnnotations(reports, maxAnnotations, annotationType) {
     }));
     return annotations;
 }
-exports.createAnnotations = createAnnotations;
 /**
  * Helper method to cut off text at certain size and add three dots to indicate that there should be more text
  * @param text the text to cut-off

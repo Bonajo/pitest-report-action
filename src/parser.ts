@@ -82,7 +82,7 @@ function parseXMLReport(data: string): Mutation[] {
         ignoreAttributes: false,
         parseAttributeValue: true,
         attributeNamePrefix: "attr_",
-        isArray: (tagName, jPath, isLeafNode) => arrays.indexOf(jPath) !== -1
+        isArray: (tagName, jPath, isLeafNode) => arrays.indexOf(String(jPath)) !== -1
     }
     const parser = new XMLParser(options);
     const xmlReport: XMLReport = parser.parse(data);

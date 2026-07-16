@@ -15,13 +15,23 @@ var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (
 }) : function(o, v) {
     o["default"] = v;
 });
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -35,7 +45,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.parseMutationReport = exports.readFile = exports.getPaths = void 0;
+exports.getPaths = getPaths;
+exports.readFile = readFile;
+exports.parseMutationReport = parseMutationReport;
 const fast_xml_parser_1 = require("fast-xml-parser");
 const glob = __importStar(require("@actions/glob"));
 const promises_1 = __importDefault(require("fs/promises"));
@@ -58,7 +70,6 @@ function getPaths(pattern) {
         return files.map(file => node_path_1.default.relative(process.cwd(), file));
     });
 }
-exports.getPaths = getPaths;
 /**
  * Read file and return contents as string
  * @param path to the file
@@ -69,7 +80,6 @@ function readFile(path) {
         return yield promises_1.default.readFile(path, { encoding: 'utf8' });
     });
 }
-exports.readFile = readFile;
 /**
  * Read and parse a mutation report and convert it to a Report class
  * @param file the mutation report to read
@@ -97,7 +107,17 @@ function parseMutationReport(file) {
         return new report_1.Report(extension, file, mutations);
     });
 }
-exports.parseMutationReport = parseMutationReport;
+/**
+ * Check if the mutations field of the XMLReport is actually of type XMLMutations
+ * @param obj
+ * @returns boolean true if obj instanceof XMLMutations
+ */
+function isXMLMutations(obj) {
+    return typeof obj === "object" &&
+        obj !== null &&
+        "mutation" in obj &&
+        Array.isArray(obj.mutation);
+}
 /**
  * Helper method to parse xml mutation report
  * @param data the xml data as string
@@ -114,10 +134,14 @@ function parseXMLReport(data) {
         ignoreAttributes: false,
         parseAttributeValue: true,
         attributeNamePrefix: "attr_",
-        isArray: (tagName, jPath, isLeafNode) => arrays.indexOf(jPath) !== -1
+        isArray: (tagName, jPath, isLeafNode) => arrays.indexOf(String(jPath)) !== -1
     };
     const parser = new fast_xml_parser_1.XMLParser(options);
     const xmlReport = parser.parse(data);
+    // If not valid XMLMutations (e.g. empty mutations is parsed as empty string "")
+    if (!isXMLMutations(xmlReport.mutations)) {
+        return [];
+    }
     return xmlReport.mutations.mutation;
 }
 /**
