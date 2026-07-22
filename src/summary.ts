@@ -1,5 +1,7 @@
-import {Mutation} from "./report";
-import {SummaryTableRow} from "@actions/core/lib/summary";
+import {Mutation} from "./report.js";
+import * as core from "@actions/core";
+
+type SummaryTableRow = Parameters<typeof core.summary.addTable>[0][number];
 
 /**
  * Helper class to keep track of statistics

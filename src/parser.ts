@@ -3,7 +3,7 @@ import * as glob from "@actions/glob";
 import fs from "fs/promises";
 import path from "node:path";
 import { parse } from "csv-parse";
-import {Mutation, MutationStatus, Report, XMLMutations, XMLReport} from "./report";
+import {Mutation, MutationStatus, Report, XMLMutations, XMLReport} from "./report.js";
 
 /**
  * Get single path from glob

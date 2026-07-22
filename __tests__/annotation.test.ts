@@ -1,8 +1,8 @@
 import {expect, test} from "@jest/globals";
-import {createAnnotations} from "../src/annotation";
-import {Mutation, Report} from "../src/report";
+import {createAnnotations} from "../src/annotation.js";
+import {Mutation, Report} from "../src/report.js";
 // @ts-ignore
-import mutationData from './mutationData.json';
+import mutationData from './mutationData.json' with { type: 'json' };
 
 const mutations = <Mutation[]>(mutationData);
 const reports = [new Report("XML", "mutations.xml", mutations)];

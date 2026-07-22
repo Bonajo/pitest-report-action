@@ -1,6 +1,6 @@
 import {expect, test} from "@jest/globals";
-import {Summary} from "../src/summary";
-import {Mutation, MutationStatus} from "../src/report";
+import {Summary} from "../src/summary.js";
+import {Mutation, MutationStatus} from "../src/report.js";
 
 function createMutation(status: MutationStatus, mutatedClass: string = "class.TestClass"): Mutation {
     return {

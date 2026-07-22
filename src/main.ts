@@ -1,10 +1,10 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
 
-import { getPaths, parseMutationReport } from "./parser";
-import { createAnnotations, AnnotationType } from "./annotation";
-import { Summary } from "./summary";
-import {getCheckRunSha} from "./context";
+import { getPaths, parseMutationReport } from "./parser.js";
+import { createAnnotations, AnnotationType } from "./annotation.js";
+import { Summary } from "./summary.js";
+import {getCheckRunSha} from "./context.js";
 
 /**
  * Main method for the pitest report action

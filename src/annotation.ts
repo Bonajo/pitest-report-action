@@ -1,4 +1,4 @@
-import {MutationStatus, Report} from "./report";
+import {MutationStatus, Report} from "./report.js";
 
 export type AnnotationType = "ALL" | MutationStatus;
 
