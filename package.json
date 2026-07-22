@@ -2,11 +2,15 @@
   "name": "pitest-report-action",
   "version": "0.8.0",
   "description": "Publish pitest reports from GitHub Action",
-  "main": "dist/main.js",
+  "type": "module",
+  "main": "dist/index.js",
+  "exports": {
+    ".": "./dist/index.js"
+  },
   "scripts": {
-    "test": "jest",
-    "build": "tsc",
-    "package": "ncc build --source-map src/main.ts"
+    "test": "NODE_OPTIONS=--experimental-vm-modules NODE_NO_WARNINGS=1 jest",
+    "build": "tsc --noEmit",
+    "package": "rimraf ./dist && rollup --config rollup.config.ts --configPlugin @rollup/plugin-typescript"
   },
   "repository": {
     "type": "git",
@@ -32,11 +36,18 @@
     "fast-xml-parser": "^5.10.1"
   },
   "devDependencies": {
+    "@rollup/plugin-commonjs": "^29.0.0",
+    "@rollup/plugin-node-resolve": "^16.0.3",
+    "@rollup/plugin-typescript": "^12.3.0",
     "@types/node": "^24.1.0",
-    "@vercel/ncc": "^0.44.1",
     "jest": "^30.4.2",
+    "rimraf": "^6.0.1",
+    "rollup": "^4.57.1",
     "ts-jest": "^29.4.11",
-    "ts-node": "^10.9.2",
+    "ts-jest-resolver": "^2.0.1",
     "typescript": "^5.9.3"
+  },
+  "optionalDependencies": {
+    "@rollup/rollup-linux-x64-gnu": "*"
   }
 }
