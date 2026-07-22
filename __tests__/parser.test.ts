@@ -1,4 +1,4 @@
-import {getPaths, parseMutationReport, readFile} from '../src/parser';
+import {getPaths, parseMutationReport, readFile} from '../src/parser.js';
 
 import {expect, test} from '@jest/globals';
 
