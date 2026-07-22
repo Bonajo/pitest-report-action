@@ -9,7 +9,7 @@ import {getCheckRunSha} from "./context.js";
 /**
  * Main method for the pitest report action
  */
-async function run(): Promise<void> {
+export async function run(): Promise<void> {
     let checksRunOngoing = false;
     let token;
     let octokit;
@@ -158,5 +158,3 @@ async function run(): Promise<void> {
         }
     }
 }
-
-run()

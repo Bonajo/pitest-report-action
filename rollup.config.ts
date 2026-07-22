@@ -5,7 +5,7 @@ import nodeResolve from '@rollup/plugin-node-resolve'
 import typescript from '@rollup/plugin-typescript'
 
 const config = {
-  input: 'src/main.ts',
+  input: 'src/index.ts',
   output: {
     esModule: true,
     file: 'dist/index.js',
