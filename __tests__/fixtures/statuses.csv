@@ -1,0 +1,7 @@
+Calculator.java,com.example.Calculator,org.pitest.mutationtest.engine.gregor.mutators.MathMutator,add,10,KILLED,com.example.CalculatorTest.[method:add()]
+Calculator.java,com.example.Calculator,org.pitest.mutationtest.engine.gregor.mutators.MathMutator,subtract,15,SURVIVED,none
+Calculator.java,com.example.Calculator,org.pitest.mutationtest.engine.gregor.mutators.MathMutator,divide,20,NO_COVERAGE,none
+Loop.java,com.example.Loop,org.pitest.mutationtest.engine.gregor.mutators.ConditionalsBoundaryMutator,run,5,TIMED_OUT,none
+Loop.java,com.example.Loop,org.pitest.mutationtest.engine.gregor.mutators.MathMutator,allocate,8,MEMORY_ERROR,none
+Loop.java,com.example.Loop,org.pitest.mutationtest.engine.gregor.mutators.NullReturnValsMutator,crash,12,RUN_ERROR,none
+Loop.java,com.example.Loop,org.pitest.mutationtest.engine.gregor.mutators.VoidMethodCallMutator,invalid,14,NON_VIABLE,none

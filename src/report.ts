@@ -1,5 +1,31 @@
-// A mutation is either KILLED or it SURVIVED
-export type MutationStatus = "KILLED" |"SURVIVED";
+/**
+ * Status of a mutation as reported by pitest
+ * https://pitest.org/quickstart/basic_concepts/
+ */
+export type MutationStatus =
+    | "KILLED"
+    | "SURVIVED"
+    | "NO_COVERAGE"
+    | "TIMED_OUT"
+    | "MEMORY_ERROR"
+    | "RUN_ERROR"
+    | "NON_VIABLE"
+    | "NOT_STARTED"
+    | "STARTED";
+
+/**
+ * Statuses where the mutation was detected by the tests, these count as killed (same as pitest)
+ */
+export const DETECTED_STATUSES: readonly MutationStatus[] = ["KILLED", "TIMED_OUT", "MEMORY_ERROR", "RUN_ERROR", "NON_VIABLE"];
+
+/**
+ * Check if the mutation was detected (killed) by the tests
+ * @param mutation the mutation to check
+ * @returns boolean true if the mutation was detected
+ */
+export function isDetected(mutation: Mutation): boolean {
+    return DETECTED_STATUSES.includes(mutation.attr_status);
+}
 
 /**
  * Mutation as parsed by the XML parser

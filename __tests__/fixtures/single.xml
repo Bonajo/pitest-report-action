@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mutations>
+    <mutation detected='false' status='SURVIVED' numberOfTestsRun='1'>
+        <sourceFile>Calculator.java</sourceFile>
+        <mutatedClass>com.example.Calculator</mutatedClass>
+        <mutatedMethod>subtract</mutatedMethod>
+        <methodDescription>(II)I</methodDescription>
+        <lineNumber>15</lineNumber>
+        <mutator>org.pitest.mutationtest.engine.gregor.mutators.MathMutator</mutator>
+        <indexes>
+            <index>3</index>
+        </indexes>
+        <blocks>
+            <block>0</block>
+        </blocks>
+        <killingTest/>
+        <description>Replaced integer subtraction with addition</description>
+    </mutation>
+</mutations>

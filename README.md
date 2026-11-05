@@ -40,11 +40,11 @@ output:
   required: false
   default: checks
 threshold:
-  description: Fail if the test-strength is below the threshold
+  description: Fail if the test strength (0 to 100) is below the threshold
   required: false
   default: '0'
 max-annotations:
-  description: Limit the number of annotations that are generated (max 50)
+  description: Limit the number of annotations that are generated (1 to 50)
   required: false
   default: 10
 token:
@@ -58,10 +58,25 @@ token:
 The action has the following outputs on successful run:
 ```yaml
 killed:
-  description: Total number of killed mutations
+  description: Total number of killed mutations (including timed out, memory error, run error and non viable)
 survived:
   description: Total number of survived mutations
+no-coverage:
+  description: Total number of mutations without test coverage
 ```
+
+## Mutation statuses
+
+The statuses reported by Pitest are counted the same way as Pitest does:
+
+| Status | Counted as | `annotation-types` |
+| --- | --- | --- |
+| `KILLED`, `TIMED_OUT`, `MEMORY_ERROR`, `RUN_ERROR`, `NON_VIABLE` | killed | `KILLED` |
+| `SURVIVED`, `NOT_STARTED`, `STARTED` | survived | `SURVIVED` |
+| `NO_COVERAGE` | no coverage | `SURVIVED` |
+
+The test strength used for the `threshold` is the percentage of killed mutations out of all mutations with coverage,
+so mutations without coverage are not included.
 
 ## Permissions
 
