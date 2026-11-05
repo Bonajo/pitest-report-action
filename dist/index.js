@@ -32,7 +32,7 @@ import require$$1$5 from 'node:dns';
 import require$$5$3 from 'string_decoder';
 import 'child_process';
 import 'timers';
-import { Transform } from 'stream';
+import 'stream';
 import fs$1 from 'fs/promises';
 import path$2 from 'node:path';
 
@@ -40172,6 +40172,10 @@ class XMLParser {
     }
 }
 
+const XMLValidator = {
+  validate: validate
+};
+
 /**
  * Returns a copy with defaults filled in.
  */
@@ -43556,10 +43560,6 @@ function create(patterns, options) {
     });
 }
 
-const is_object = function (obj) {
-  return typeof obj === "object" && obj !== null && !Array.isArray(obj);
-};
-
 class CsvError extends Error {
   constructor(code, message, options, ...contexts) {
     if (Array.isArray(message)) message = message.join(" ").trim();
@@ -43580,6 +43580,10 @@ class CsvError extends Error {
     }
   }
 }
+
+const is_object = function (obj) {
+  return typeof obj === "object" && obj !== null && !Array.isArray(obj);
+};
 
 const normalize_columns_array = function (columns) {
   const normalizedColumns = [];
@@ -45543,144 +45547,36 @@ const transform = function (original_options = {}) {
   };
 };
 
-/*
-CSV Parse
-
-Please look at the [project documentation](https://csv.js.org/parse/) for
-additional information.
-*/
-
-
-class Parser extends Transform {
-  constructor(opts = {}) {
-    super({ ...{ readableObjectMode: true }, ...opts, encoding: null });
-    this.api = transform({
-      on_skip: (err, chunk) => {
-        this.emit("skip", err, chunk);
-      },
-      ...opts,
-    });
-    // Backward compatibility
-    this.state = this.api.state;
-    this.options = this.api.options;
-    this.info = this.api.info;
+const parse = function (data, opts = {}) {
+  if (typeof data === "string") {
+    data = Buffer.from(data);
   }
-  // Implementation of `Transform._transform`
-  _transform(buf, _, callback) {
-    if (this.state.stop === true) {
-      return;
+  const records = opts && opts.objname ? Object.create(null) : [];
+  const parser = transform(opts);
+  const push = (record) => {
+    if (parser.options.objname === undefined) records.push(record);
+    else {
+      records[record[0]] = record[1];
     }
-    const err = this.api.parse(
-      buf,
-      false,
-      (record) => {
-        this.push(record);
-      },
-      () => {
-        this.push(null);
-        this.end();
-        // Fix #333 and break #410
-        //   ko: api.stream.iterator.coffee
-        //   ko with v21.4.0, ok with node v20.5.1: api.stream.finished # aborted (with generate())
-        //   ko: api.stream.finished # aborted (with Readable)
-        // this.destroy()
-        // Fix #410 and partially break #333
-        //   ok: api.stream.iterator.coffee
-        //   ok: api.stream.finished # aborted (with generate())
-        //   broken: api.stream.finished # aborted (with Readable)
-        this.on("end", this.destroy);
-      },
-    );
-    if (err !== undefined) {
-      this.state.stop = true;
-    }
-    callback(err);
-  }
-  // Implementation of `Transform._flush`
-  _flush(callback) {
-    if (this.state.stop === true) {
-      return;
-    }
-    const err = this.api.parse(
-      undefined,
-      true,
-      (record) => {
-        this.push(record);
-      },
-      () => {
-        this.push(null);
-        this.on("end", this.destroy);
-      },
-    );
-    callback(err);
-  }
-}
-
-const parse = function () {
-  let data, options, callback;
-  for (const i in arguments) {
-    const argument = arguments[i];
-    const type = typeof argument;
-    if (
-      data === undefined &&
-      (typeof argument === "string" || Buffer.isBuffer(argument))
-    ) {
-      data = argument;
-    } else if (options === undefined && is_object(argument)) {
-      options = argument;
-    } else if (callback === undefined && type === "function") {
-      callback = argument;
-    } else {
-      throw new CsvError(
-        "CSV_INVALID_ARGUMENT",
-        ["Invalid argument:", `got ${JSON.stringify(argument)} at index ${i}`],
-        options || {},
-      );
-    }
-  }
-  const parser = new Parser(options);
-  if (callback) {
-    const records =
-      options === undefined || options.objname === undefined
-        ? []
-        : Object.create(null);
-    parser.on("readable", function () {
-      let record;
-      while ((record = this.read()) !== null) {
-        if (options === undefined || options.objname === undefined) {
-          records.push(record);
-        } else {
-          Object.assign(records, {
-            [record[0]]: record[1],
-            // writable: true,
-            // enumerable: true,
-            // configurable: true
-          });
-        }
-      }
-    });
-    parser.on("error", function (err) {
-      callback(err, undefined, parser.api.__infoDataSet());
-    });
-    parser.on("end", function () {
-      callback(undefined, records, parser.api.__infoDataSet());
-    });
-  }
-  if (data !== undefined) {
-    const writer = function () {
-      parser.write(data);
-      parser.end();
-    };
-    // Support Deno, Rollup doesn't provide a shim for setImmediate
-    if (typeof setImmediate === "function") {
-      setImmediate(writer);
-    } else {
-      setTimeout(writer, 0);
-    }
-  }
-  return parser;
+  };
+  const close = () => {};
+  const error = parser.parse(data, true, push, close);
+  if (error !== undefined) throw error;
+  return records;
 };
 
+/**
+ * Statuses where the mutation was detected by the tests, these count as killed (same as pitest)
+ */
+const DETECTED_STATUSES = ["KILLED", "TIMED_OUT", "MEMORY_ERROR", "RUN_ERROR", "NON_VIABLE"];
+/**
+ * Check if the mutation was detected (killed) by the tests
+ * @param mutation the mutation to check
+ * @returns boolean true if the mutation was detected
+ */
+function isDetected(mutation) {
+    return DETECTED_STATUSES.includes(mutation.attr_status);
+}
 /**
  * Class to unify different types of mutation reports
  */
@@ -45744,7 +45640,7 @@ async function parseMutationReport(file) {
     let mutations = [];
     switch (extension) {
         case 'XML':
-            mutations = parseXMLReport(data);
+            mutations = parseXMLReport(data, file);
             break;
         case 'CSV':
             mutations = parseCSVReport(data);
@@ -45766,9 +45662,15 @@ function isXMLMutations(obj) {
 /**
  * Helper method to parse xml mutation report
  * @param data the xml data as string
+ * @param file the file the data was read from, used in error messages
  * @returns Mutation[] array containing parsed mutations
+ * @throws Error if the data is not valid XML or not a pitest mutation report
  */
-function parseXMLReport(data) {
+function parseXMLReport(data, file) {
+    const validation = XMLValidator.validate(data);
+    if (validation !== true) {
+        throw new Error(`Invalid XML in ${file}: ${validation.err.msg} (line ${validation.err.line})`);
+    }
     const arrays = [
         "mutations.mutation",
         "mutations.mutation.indexes",
@@ -45783,6 +45685,9 @@ function parseXMLReport(data) {
     };
     const parser = new XMLParser(options);
     const xmlReport = parser.parse(data);
+    if (xmlReport.mutations === undefined) {
+        throw new Error(`${file} is not a pitest mutation report, missing <mutations> root element`);
+    }
     // If not valid XMLMutations (e.g. empty mutations is parsed as empty string "")
     if (!isXMLMutations(xmlReport.mutations)) {
         return [];
@@ -45793,59 +45698,64 @@ function parseXMLReport(data) {
  * Helper method to parse CSV mutation report
  * @param data the csv data as string
  * @returns Mutation[] array contained the parsed mutations
+ * @throws Error if the data cannot be parsed as CSV
  */
 function parseCSVReport(data) {
-    const mutations = [];
-    const parser = parse({
-        delimiter: ','
-    });
-    parser.on('readable', () => {
-        let mutation;
-        while ((mutation = parser.read()) !== null) {
-            mutations.push({
-                sourceFile: mutation[0],
-                mutatedClass: mutation[1],
-                mutator: mutation[2],
-                mutatedMethod: mutation[3],
-                lineNumber: parseInt(mutation[4], 10),
-                attr_status: mutation[5],
-                killingTest: (mutation[6] === "none") ? undefined : mutation[6]
-            });
-        }
-    });
-    parser.on('error', (error) => {
+    let records;
+    try {
+        records = parse(data, { delimiter: ',' });
+    }
+    catch (error) {
+        // csv-parse always throws a CsvError (subclass of Error)
         throw new Error(`Unable to parse CSV, error: ${error.message}`);
-    });
-    parser.write(data);
-    parser.end();
-    return mutations;
+    }
+    return records.map(record => ({
+        sourceFile: record[0],
+        mutatedClass: record[1],
+        mutator: record[2],
+        mutatedMethod: record[3],
+        lineNumber: parseInt(record[4], 10),
+        attr_status: record[5],
+        killingTest: (record[6] === "none") ? undefined : record[6]
+    }));
 }
 
+const ANNOTATION_TYPES = ["ALL", "KILLED", "SURVIVED"];
+// Limits as defined by the Check Runs API
+const MAX_TEXT_SIZE = 64 * 1024;
+const MAX_TITLE_SIZE = 255;
+/**
+ * Check if the mutation should be annotated for the annotation type
+ * KILLED includes all detected statuses, SURVIVED includes all undetected statuses (e.g. NO_COVERAGE)
+ */
+function matchesType(mutation, annotationType) {
+    switch (annotationType) {
+        case "ALL": return true;
+        case "KILLED": return isDetected(mutation);
+        case "SURVIVED": return !isDetected(mutation);
+    }
+}
 /**
  * Create Check Runs Annotation for every selected annotation
  * @param reports array of reports
- * @param maxAnnotations max number of annotations to process
+ * @param maxAnnotations max number of annotations to process (across all reports)
  * @param annotationType which mutations to include
  * @returns annotation[] annotations that can be used for Checks Run
  */
 function createAnnotations(reports, maxAnnotations, annotationType) {
-    let annotations = [];
-    reports.map(report => report.mutations
-        .filter(m => annotationType === "ALL" || m.attr_status === annotationType)
-        .slice(0, Math.max(maxAnnotations - annotations.length, 0))
-        .forEach(m => {
-        const annotation = {
-            path: m.mutatedClass,
-            start_line: m.lineNumber,
-            end_line: m.lineNumber,
-            annotation_level: m.attr_status === "KILLED" ? "notice" : "warning",
-            message: limitStringSize((!!m.description) ? m.description : m.mutator, 64 * 1024),
-            raw_details: limitStringSize(JSON.stringify(m, null, 2), 64 * 1024),
-            title: limitStringSize(`${m.attr_status} -> ${m.mutatedClass}:${m.mutatedMethod}`, 255)
-        };
-        annotations.push(annotation);
+    return reports
+        .flatMap(report => report.mutations)
+        .filter(m => matchesType(m, annotationType))
+        .slice(0, Math.max(maxAnnotations, 0))
+        .map((m) => ({
+        path: m.mutatedClass,
+        start_line: m.lineNumber,
+        end_line: m.lineNumber,
+        annotation_level: isDetected(m) ? "notice" : "warning",
+        message: limitStringSize((!!m.description) ? m.description : m.mutator, MAX_TEXT_SIZE),
+        raw_details: limitStringSize(JSON.stringify(m, null, 2), MAX_TEXT_SIZE),
+        title: limitStringSize(`${m.attr_status} -> ${m.mutatedClass}:${m.mutatedMethod}`, MAX_TITLE_SIZE)
     }));
-    return annotations;
 }
 /**
  * Helper method to cut off text at certain size and add three dots to indicate that there should be more text
@@ -45861,22 +45771,40 @@ function limitStringSize(text, maxSize) {
  * Helper class to keep track of statistics
  */
 class SummaryStat {
-    _survived = 0;
     _killed = 0;
-    get survived() {
-        return this._survived;
-    }
+    _survived = 0;
+    _noCoverage = 0;
+    /**
+     * Number of mutations detected by the tests (KILLED, TIMED_OUT, MEMORY_ERROR, RUN_ERROR, NON_VIABLE)
+     */
     get killed() {
         return this._killed;
     }
+    /**
+     * Number of mutations that were covered by tests, but not detected
+     */
+    get survived() {
+        return this._survived;
+    }
+    /**
+     * Number of mutations that were not covered by any test
+     */
+    get noCoverage() {
+        return this._noCoverage;
+    }
     get total() {
-        return this.killed + this.survived;
+        return this.killed + this.survived + this.noCoverage;
     }
-    increaseSurvived() {
-        this._survived++;
-    }
-    increaseKilled() {
-        this._killed++;
+    add(mutation) {
+        if (isDetected(mutation)) {
+            this._killed++;
+        }
+        else if (mutation.attr_status === "NO_COVERAGE") {
+            this._noCoverage++;
+        }
+        else {
+            this._survived++;
+        }
     }
 }
 /**
@@ -45891,22 +45819,17 @@ class Summary {
      * @returns Summary for fluent programming
      */
     process(mutation) {
-        if (!this.stats.has(mutation.mutatedClass)) {
-            this.stats.set(mutation.mutatedClass, new SummaryStat());
+        let stat = this.stats.get(mutation.mutatedClass);
+        if (stat === undefined) {
+            stat = new SummaryStat();
+            this.stats.set(mutation.mutatedClass, stat);
         }
-        const stat = this.stats.get(mutation.mutatedClass);
-        if (mutation.attr_status === "KILLED") {
-            stat?.increaseKilled();
-            this._total.increaseKilled();
-        }
-        else {
-            stat?.increaseSurvived();
-            this._total.increaseSurvived();
-        }
+        stat.add(mutation);
+        this._total.add(mutation);
         return this;
     }
     /**
-     * Get total number of killed mutations processed so far
+     * Get total number of killed (detected) mutations processed so far
      */
     get killed() {
         return this._total.killed;
@@ -45918,16 +45841,27 @@ class Summary {
         return this._total.survived;
     }
     /**
+     * Get total number of mutations without test coverage processed so far
+     */
+    get noCoverage() {
+        return this._total.noCoverage;
+    }
+    /**
      * Get total number of mutations processed so far
      */
     get total() {
         return this._total.total;
     }
+    /**
+     * Test strength as calculated by pitest: percentage of the covered mutations that were killed.
+     * Mutations without coverage are excluded.
+     */
     get strength() {
-        if (this._total.total === 0) {
+        const covered = this._total.total - this._total.noCoverage;
+        if (covered === 0) {
             return 0;
         }
-        return this._total.killed / this._total.total * 100;
+        return this._total.killed / covered * 100;
     }
     /**
      * Convert this summary to a SummaryTable
@@ -45937,23 +45871,30 @@ class Summary {
             { data: 'Class', header: true },
             { data: 'Mutations', header: true },
             { data: 'KILLED', header: true },
-            { data: 'SURVIVED', header: true }
+            { data: 'SURVIVED', header: true },
+            { data: 'NO_COVERAGE', header: true }
         ];
         const rows = Array.from(this.stats.entries())
-            .map(v => [v[0], `${v[1].total}`, `${v[1].killed}`, `${v[1].survived}`]);
-        rows.push(["Total", `${this.total}`, `${this.killed}`, `${this.survived}`]);
+            .map(([name, stat]) => [name, ...Summary.columns(stat)]);
+        rows.push(["Total", ...Summary.columns(this._total)]);
         return [headers, ...rows];
     }
     /**
      * Convert this summary to a Markdown table
      */
     toSummaryMarkdown() {
-        const headers = '| Class | Mutations | KILLED | SURVIVED |';
-        const separator = '| --- | --- | --- | --- |';
+        const headers = '| Class | Mutations | KILLED | SURVIVED | NO_COVERAGE |';
+        const separator = '| --- | --- | --- | --- | --- |';
         const rows = Array.from(this.stats.entries())
-            .map(v => `| ${v[0]} | ${v[1].total} | ${v[1].killed} | ${v[1].survived} |`);
-        const total = `| Total | ${this.total} | ${this.killed} | ${this.survived} |`;
+            .map(([name, stat]) => `| ${[name, ...Summary.columns(stat)].join(" | ")} |`);
+        const total = `| ${["Total", ...Summary.columns(this._total)].join(" | ")} |`;
         return [headers, separator, ...rows, total].join("\n");
+    }
+    /**
+     * The numeric columns of a table row
+     */
+    static columns(stat) {
+        return [`${stat.total}`, `${stat.killed}`, `${stat.survived}`, `${stat.noCoverage}`];
     }
 }
 
@@ -45991,22 +45932,27 @@ async function run() {
         const summary$1 = getBooleanInput("summary");
         const annotationsString = getInput("annotation-types");
         const output = getInput("output");
-        const maxAnnotations = parseInt(getInput("max-annotations"), 10);
+        const maxAnnotationsString = getInput("max-annotations");
         const name = getInput("name");
         token = getInput("token");
-        const threshold = parseInt(getInput("threshold"));
-        octokit = getOctokit(token);
-        // Validate inputs
-        if (!annotationsString || ['ALL', 'KILLED', 'SURVIVED'].indexOf(annotationsString) === -1) {
-            setFailed(`Annotations should be one of ALL, KILLED or SURVIVED, but was ${annotationsString}`);
+        const thresholdString = getInput("threshold");
+        // Validate inputs, fail before anything is created
+        if (!ANNOTATION_TYPES.includes(annotationsString)) {
+            throw new Error(`Annotations should be one of ALL, KILLED or SURVIVED, but was ${annotationsString}`);
         }
         const annotationTypes = annotationsString;
         if (output !== "checks" && output !== "workflow") {
-            setFailed(`Output should either be 'check' or 'workflow', but is ${output}`);
+            throw new Error(`Output should either be 'checks' or 'workflow', but is ${output}`);
         }
-        if (!maxAnnotations || isNaN(maxAnnotations) || maxAnnotations > 50) {
-            setFailed(`Max number of annotations should be a number and max of 50, but is ${maxAnnotations}`);
+        const maxAnnotations = Number(maxAnnotationsString);
+        if (!Number.isInteger(maxAnnotations) || maxAnnotations < 1 || maxAnnotations > 50) {
+            throw new Error(`Max number of annotations should be a number between 1 and 50, but is ${maxAnnotationsString}`);
         }
+        const threshold = Number(thresholdString);
+        if (isNaN(threshold) || threshold < 0 || threshold > 100) {
+            throw new Error(`Threshold should be a number between 0 and 100, but is ${thresholdString}`);
+        }
+        octokit = getOctokit(token);
         // Get path to file
         const paths = await getPaths(file);
         // Create check run if needed
@@ -46028,7 +45974,7 @@ async function run() {
             info(`Checks run created with id: ${checksId}`);
             checksRunOngoing = true;
         }
-        // Read the mutations.xml and parse to objects
+        // Read the mutation reports and parse to objects
         const reports = await Promise.all(paths.map(path => parseMutationReport(path)));
         // Create the annotations
         const annotations = createAnnotations(reports, maxAnnotations, annotationTypes);
@@ -46039,6 +45985,7 @@ async function run() {
         // Set outputs
         setOutput("killed", results.killed);
         setOutput("survived", results.survived);
+        setOutput("no-coverage", results.noCoverage);
         const hasFailed = results.strength < threshold;
         // Add the annotations
         if (output === "checks" && typeof checksId == "number") {
@@ -46062,20 +46009,9 @@ async function run() {
         }
         else {
             // Add annotations on the workflow itself
+            const annotate = { notice: notice, warning: warning, failure: error };
             for (const annotation of annotations) {
-                let fn;
-                switch (annotation.annotation_level) {
-                    case "notice":
-                        fn = notice;
-                        break;
-                    case "warning":
-                        fn = warning;
-                        break;
-                    case "failure":
-                        fn = error;
-                        break;
-                }
-                fn(annotation.message, {
+                annotate[annotation.annotation_level](annotation.message, {
                     title: annotation.title,
                     file: annotation.path,
                     startLine: annotation.start_line

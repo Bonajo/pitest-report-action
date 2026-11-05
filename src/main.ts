@@ -2,7 +2,7 @@ import * as core from '@actions/core';
 import * as github from '@actions/github';
 
 import { getPaths, parseMutationReport } from "./parser.js";
-import { createAnnotations, AnnotationType } from "./annotation.js";
+import { createAnnotations, AnnotationType, ANNOTATION_TYPES } from "./annotation.js";
 import { Summary } from "./summary.js";
 import {getCheckRunSha} from "./context.js";
 
@@ -20,25 +20,32 @@ export async function run(): Promise<void> {
         const summary = core.getBooleanInput("summary");
         const annotationsString = core.getInput("annotation-types");
         const output = core.getInput("output");
-        const maxAnnotations =  parseInt(core.getInput("max-annotations"), 10);
+        const maxAnnotationsString = core.getInput("max-annotations");
         const name = core.getInput("name");
         token = core.getInput("token");
-        const threshold = parseInt(core.getInput("threshold"));
-        octokit = github.getOctokit(token);
+        const thresholdString = core.getInput("threshold");
 
-        // Validate inputs
-        if(!annotationsString || ['ALL', 'KILLED', 'SURVIVED'].indexOf(annotationsString) === -1){
-            core.setFailed(`Annotations should be one of ALL, KILLED or SURVIVED, but was ${annotationsString}`);
+        // Validate inputs, fail before anything is created
+        if(!ANNOTATION_TYPES.includes(annotationsString as AnnotationType)){
+            throw new Error(`Annotations should be one of ALL, KILLED or SURVIVED, but was ${annotationsString}`);
         }
         const annotationTypes = <AnnotationType>annotationsString;
 
         if(output !== "checks" && output !== "workflow"){
-            core.setFailed(`Output should either be 'check' or 'workflow', but is ${output}`);
+            throw new Error(`Output should either be 'checks' or 'workflow', but is ${output}`);
         }
 
-        if(!maxAnnotations || isNaN(maxAnnotations) || maxAnnotations > 50){
-            core.setFailed(`Max number of annotations should be a number and max of 50, but is ${maxAnnotations}`);
+        const maxAnnotations = Number(maxAnnotationsString);
+        if(!Number.isInteger(maxAnnotations) || maxAnnotations < 1 || maxAnnotations > 50){
+            throw new Error(`Max number of annotations should be a number between 1 and 50, but is ${maxAnnotationsString}`);
         }
+
+        const threshold = Number(thresholdString);
+        if(isNaN(threshold) || threshold < 0 || threshold > 100){
+            throw new Error(`Threshold should be a number between 0 and 100, but is ${thresholdString}`);
+        }
+
+        octokit = github.getOctokit(token);
 
         // Get path to file
         const paths = await getPaths(file);
@@ -63,7 +70,7 @@ export async function run(): Promise<void> {
             checksRunOngoing = true;
         }
 
-        // Read the mutations.xml and parse to objects
+        // Read the mutation reports and parse to objects
         const reports = await Promise.all(paths.map(path => parseMutationReport(path)));
 
         // Create the annotations
@@ -77,6 +84,7 @@ export async function run(): Promise<void> {
         // Set outputs
         core.setOutput("killed", results.killed);
         core.setOutput("survived", results.survived);
+        core.setOutput("no-coverage", results.noCoverage);
 
         const hasFailed = results.strength < threshold;
 
@@ -101,17 +109,9 @@ export async function run(): Promise<void> {
             checksRunOngoing = false;
         }else{
             // Add annotations on the workflow itself
+            const annotate = {notice: core.notice, warning: core.warning, failure: core.error};
             for(const annotation of annotations){
-                let fn;
-                switch(annotation.annotation_level){
-                    case "notice":
-                        fn = core.notice; break;
-                    case "warning":
-                        fn = core.warning; break;
-                    case "failure":
-                        fn = core.error; break;
-                }
-                fn(annotation.message, {
+                annotate[annotation.annotation_level](annotation.message, {
                     title: annotation.title,
                     file: annotation.path,
                     startLine: annotation.start_line

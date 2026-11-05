@@ -1,8 +1,8 @@
-import { X2jOptions, XMLParser } from "fast-xml-parser";
+import { X2jOptions, XMLParser, XMLValidator } from "fast-xml-parser";
 import * as glob from "@actions/glob";
 import fs from "fs/promises";
 import path from "node:path";
-import { parse } from "csv-parse";
+import { parse } from "csv-parse/sync";
 import {Mutation, MutationStatus, Report, XMLMutations, XMLReport} from "./report.js";
 
 /**
@@ -47,9 +47,9 @@ export async function parseMutationReport(file: string): Promise<Report> {
     let mutations: Mutation[] = [];
     switch (extension){
         case 'XML':
-            mutations = parseXMLReport(data); break;
+            mutations = parseXMLReport(data, file); break;
         case 'CSV':
-            mutations =  parseCSVReport(data); break;
+            mutations = parseCSVReport(data); break;
     }
     return new Report(extension, file, mutations);
 }
@@ -69,9 +69,15 @@ function isXMLMutations(obj: any): obj is XMLMutations {
 /**
  * Helper method to parse xml mutation report
  * @param data the xml data as string
+ * @param file the file the data was read from, used in error messages
  * @returns Mutation[] array containing parsed mutations
+ * @throws Error if the data is not valid XML or not a pitest mutation report
  */
-function parseXMLReport(data: string): Mutation[] {
+function parseXMLReport(data: string, file: string): Mutation[] {
+    const validation = XMLValidator.validate(data);
+    if(validation !== true){
+        throw new Error(`Invalid XML in ${file}: ${validation.err.msg} (line ${validation.err.line})`);
+    }
     const arrays = [
         "mutations.mutation",
         "mutations.mutation.indexes",
@@ -85,7 +91,10 @@ function parseXMLReport(data: string): Mutation[] {
         isArray: (tagName, jPath, isLeafNode) => arrays.indexOf(String(jPath)) !== -1
     }
     const parser = new XMLParser(options);
-    const xmlReport: XMLReport = parser.parse(data);
+    const xmlReport: Partial<XMLReport> = parser.parse(data);
+    if(xmlReport.mutations === undefined){
+        throw new Error(`${file} is not a pitest mutation report, missing <mutations> root element`);
+    }
     // If not valid XMLMutations (e.g. empty mutations is parsed as empty string "")
     if(!isXMLMutations(xmlReport.mutations)) {
         return [];
@@ -97,34 +106,23 @@ function parseXMLReport(data: string): Mutation[] {
  * Helper method to parse CSV mutation report
  * @param data the csv data as string
  * @returns Mutation[] array contained the parsed mutations
+ * @throws Error if the data cannot be parsed as CSV
  */
 function parseCSVReport(data: string): Mutation[]{
-    const mutations: Mutation[] = [];
-    const parser = parse({
-        delimiter: ','
-    });
-
-    parser.on('readable', () => {
-        let mutation;
-        while((mutation = parser.read()) !== null){
-            mutations.push({
-                sourceFile: <string>mutation[0],
-                mutatedClass: <string>mutation[1],
-                mutator: <string>mutation[2],
-                mutatedMethod: <string>mutation[3],
-                lineNumber: parseInt(mutation[4], 10),
-                attr_status: <MutationStatus>mutation[5],
-                killingTest: (mutation[6] === "none") ? undefined : mutation[6]
-            });
-        }
-    });
-
-    parser.on('error', (error) => {
-        throw new Error(`Unable to parse CSV, error: ${error.message}`)
-    });
-
-    parser.write(data);
-    parser.end();
-
-    return mutations;
+    let records: string[][];
+    try {
+        records = parse(data, {delimiter: ','});
+    } catch (error) {
+        // csv-parse always throws a CsvError (subclass of Error)
+        throw new Error(`Unable to parse CSV, error: ${(error as Error).message}`);
+    }
+    return records.map(record => ({
+        sourceFile: record[0],
+        mutatedClass: record[1],
+        mutator: record[2],
+        mutatedMethod: record[3],
+        lineNumber: parseInt(record[4], 10),
+        attr_status: <MutationStatus>record[5],
+        killingTest: (record[6] === "none") ? undefined : record[6]
+    }));
 }

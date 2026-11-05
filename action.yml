@@ -14,7 +14,7 @@ inputs:
     required: false
     default: 'true'
   annotation-types:
-    description: Generate annotation for status (ALL, SURVIVED, KILLED)
+    description: Generate annotation for status (ALL, SURVIVED, KILLED). SURVIVED includes mutations without coverage
     required: false
     default: SURVIVED
   output:
@@ -22,11 +22,11 @@ inputs:
     required: false
     default: checks
   max-annotations:
-    description: Limit the number of annotations that are generated (max 50)
+    description: Limit the number of annotations that are generated (1 to 50)
     required: false
     default: '10'
   threshold:
-    description: Fail if the test-strength is below the threshold
+    description: Fail if the test strength (0 to 100) is below the threshold
     required: false
     default: '0'
   token:
@@ -35,9 +35,11 @@ inputs:
     default: ${{ github.token }}
 outputs:
   killed:
-    description: Total number of killed mutations
+    description: Total number of killed mutations (including timed out, memory error, run error and non viable)
   survived:
     description: Total number of survived mutations
+  no-coverage:
+    description: Total number of mutations without test coverage
 runs:
   using: 'node24'
   main: 'dist/index.js'

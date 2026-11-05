@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mutations>
+    <mutation detected='true' status='KILLED' numberOfTestsRun='2'>
+        <sourceFile>Calculator.java</sourceFile>
+        <mutatedClass>com.example.Calculator</mutatedClass>
+        <mutatedMethod>add</mutatedMethod>
+        <methodDescription>(II)I</methodDescription>
+        <lineNumber>10</lineNumber>
+        <mutator>org.pitest.mutationtest.engine.gregor.mutators.MathMutator</mutator>
+        <indexes>
+            <index>1</index>
+        </indexes>
+        <blocks>
+            <block>0</block>
+        </blocks>
+        <killingTest>com.example.CalculatorTest.[method:add()]</killingTest>
+        <description>killed mutation</description>
+    </mutation>
+    <mutation detected='false' status='SURVIVED' numberOfTestsRun='1'>
+        <sourceFile>Calculator.java</sourceFile>
+        <mutatedClass>com.example.Calculator</mutatedClass>
+        <mutatedMethod>subtract</mutatedMethod>
+        <methodDescription>(II)I</methodDescription>
+        <lineNumber>15</lineNumber>
+        <mutator>org.pitest.mutationtest.engine.gregor.mutators.MathMutator</mutator>
+        <indexes>
+            <index>2</index>
+        </indexes>
+        <blocks>
+            <block>1</block>
+        </blocks>
+        <killingTest/>
+        <description>survived mutation</description>
+    </mutation>
+    <mutation detected='false' status='NO_COVERAGE' numberOfTestsRun='0'>
+        <sourceFile>Calculator.java</sourceFile>
+        <mutatedClass>com.example.Calculator</mutatedClass>
+        <mutatedMethod>divide</mutatedMethod>
+        <methodDescription>(II)I</methodDescription>
+        <lineNumber>20</lineNumber>
+        <mutator>org.pitest.mutationtest.engine.gregor.mutators.MathMutator</mutator>
+        <indexes>
+            <index>3</index>
+        </indexes>
+        <blocks>
+            <block>2</block>
+        </blocks>
+        <killingTest/>
+        <description>no_coverage mutation</description>
+    </mutation>
+    <mutation detected='true' status='TIMED_OUT' numberOfTestsRun='1'>
+        <sourceFile>Loop.java</sourceFile>
+        <mutatedClass>com.example.Loop</mutatedClass>
+        <mutatedMethod>run</mutatedMethod>
+        <methodDescription>(II)I</methodDescription>
+        <lineNumber>5</lineNumber>
+        <mutator>org.pitest.mutationtest.engine.gregor.mutators.ConditionalsBoundaryMutator</mutator>
+        <indexes>
+            <index>4</index>
+        </indexes>
+        <blocks>
+            <block>3</block>
+        </blocks>
+        <killingTest/>
+        <description>timed_out mutation</description>
+    </mutation>
+    <mutation detected='true' status='MEMORY_ERROR' numberOfTestsRun='1'>
+        <sourceFile>Loop.java</sourceFile>
+        <mutatedClass>com.example.Loop</mutatedClass>
+        <mutatedMethod>allocate</mutatedMethod>
+        <methodDescription>(II)I</methodDescription>
+        <lineNumber>8</lineNumber>
+        <mutator>org.pitest.mutationtest.engine.gregor.mutators.MathMutator</mutator>
+        <indexes>
+            <index>5</index>
+        </indexes>
+        <blocks>
+            <block>4</block>
+        </blocks>
+        <killingTest/>
+        <description>memory_error mutation</description>
+    </mutation>
+    <mutation detected='true' status='RUN_ERROR' numberOfTestsRun='1'>
+        <sourceFile>Loop.java</sourceFile>
+        <mutatedClass>com.example.Loop</mutatedClass>
+        <mutatedMethod>crash</mutatedMethod>
+        <methodDescription>(II)I</methodDescription>
+        <lineNumber>12</lineNumber>
+        <mutator>org.pitest.mutationtest.engine.gregor.mutators.NullReturnValsMutator</mutator>
+        <indexes>
+            <index>6</index>
+        </indexes>
+        <blocks>
+            <block>5</block>
+        </blocks>
+        <killingTest/>
+        <description>run_error mutation</description>
+    </mutation>
+    <mutation detected='true' status='NON_VIABLE' numberOfTestsRun='0'>
+        <sourceFile>Loop.java</sourceFile>
+        <mutatedClass>com.example.Loop</mutatedClass>
+        <mutatedMethod>invalid</mutatedMethod>
+        <methodDescription>(II)I</methodDescription>
+        <lineNumber>14</lineNumber>
+        <mutator>org.pitest.mutationtest.engine.gregor.mutators.VoidMethodCallMutator</mutator>
+        <indexes>
+            <index>7</index>
+        </indexes>
+        <blocks>
+            <block>6</block>
+        </blocks>
+        <killingTest/>
+        <description>non_viable mutation</description>
+    </mutation>
+</mutations>
