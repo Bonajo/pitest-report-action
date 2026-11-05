@@ -33,7 +33,7 @@
     "@actions/github": "^9.1.1",
     "@actions/glob": "^0.7.0",
     "@octokit/webhooks-types": "^7.6.1",
-    "csv-parse": "^7.0.1",
+    "csv-parse": "^7.0.3",
     "fast-xml-parser": "^5.10.1"
   },
   "devDependencies": {
@@ -51,5 +51,12 @@
   },
   "optionalDependencies": {
     "@rollup/rollup-linux-x64-gnu": "*"
+  },
+  "overrides": {
+    "glob": "^14.0.3",
+    "undici@<6.29.1": "^6.29.1",
+    "test-exclude": {
+      "minimatch": "^11.0.4"
+    }
   }
 }
