@@ -1,4 +1,12 @@
-on: [push]
+# Pushes to main keep main's status and the actions cache up to date; PRs are
+# tested through pull_request so the required check also reports on PRs from
+# forks, which never trigger a push run in this repository. Limiting push to
+# main avoids running the tests twice for every commit on a PR branch.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
 
 jobs:
   test-action:
