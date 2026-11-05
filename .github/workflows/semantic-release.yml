@@ -33,9 +33,12 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
+      # Only provides npm for installing extra_plugins: the action itself runs
+      # semantic-release on the runner's bundled Node (node24). Same version as
+      # the rest of the repo.
       - uses: actions/setup-node@v7
         with:
-          node-version: 22
+          node-version: 24
 
       # Pinned to an exact version: this action publishes no floating major
       # tags, so @v8 would not resolve. The plugins in .releaserc.json ship
