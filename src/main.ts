@@ -5,6 +5,7 @@ import { getPaths, parseMutationReport } from "./parser.js";
 import { createAnnotations, AnnotationType, ANNOTATION_TYPES } from "./annotation.js";
 import { Summary } from "./summary.js";
 import {getCheckRunSha} from "./context.js";
+import { listRepositoryFiles, SourceResolver } from "./sources.js";
 
 /**
  * Main method for the pitest report action
@@ -74,7 +75,15 @@ export async function run(): Promise<void> {
         const reports = await Promise.all(paths.map(path => parseMutationReport(path)));
 
         // Create the annotations
-        const annotations = createAnnotations(reports, maxAnnotations, annotationTypes);
+        // Place the annotations on the source files in the repository
+        const sources = new SourceResolver(await listRepositoryFiles());
+        const annotations = createAnnotations(reports, maxAnnotations, annotationTypes, (mutation, report) => {
+            const path = sources.resolve(mutation, report.path);
+            if(path === undefined){
+                core.info(`Source file of ${mutation.mutatedClass} not found in the repository, using the class name as path`);
+            }
+            return path;
+        });
 
         // Create summary
         const results = reports

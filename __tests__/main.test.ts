@@ -169,6 +169,38 @@ describe('output: checks', () => {
     });
 });
 
+describe('annotation paths', () => {
+    const CALCULATOR = '__tests__/fixtures/project/src/main/java/com/example/Calculator.java';
+    const LOOP = '__tests__/fixtures/project/src/main/java/com/example/Loop.java';
+
+    test('places workflow annotations on the source files in the repository', async () => {
+        await runWith({'file': fixture('statuses.xml'), 'output': 'workflow', 'annotation-types': 'ALL'});
+
+        expect(core.warning).toHaveBeenCalledWith('survived mutation', {
+            title: 'SURVIVED -> com.example.Calculator:subtract',
+            file: CALCULATOR,
+            startLine: 15
+        });
+        expect(core.notice).toHaveBeenCalledWith('timed_out mutation', expect.objectContaining({file: LOOP, startLine: 5}));
+    });
+
+    test('places check run annotations on the source files in the repository', async () => {
+        await runWith({'file': fixture('statuses.csv'), 'annotation-types': 'SURVIVED'});
+
+        const params = update.mock.calls[0][0] as {output: {annotations: {path: string, start_line: number}[]}};
+        expect(params.output.annotations.map(a => [a.path, a.start_line])).toEqual([[CALCULATOR, 15], [CALCULATOR, 20]]);
+    });
+
+    test('uses the class name when the source file is not in the repository', async () => {
+        await runWith({'output': 'workflow'});
+
+        expect(core.warning).toHaveBeenCalledWith(expect.any(String),
+            expect.objectContaining({file: 'io.github.bonajo.tablegenerator.GeneratorMain'}));
+        expect(core.info).toHaveBeenCalledWith(
+            'Source file of io.github.bonajo.tablegenerator.GeneratorMain not found in the repository, using the class name as path');
+    });
+});
+
 describe('outputs and threshold', () => {
     test('sets the killed, survived and no-coverage outputs', async () => {
         await runWith({'file': fixture('statuses.xml'), 'output': 'workflow'});
