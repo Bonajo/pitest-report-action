@@ -7,10 +7,11 @@ This action parses the `mutations.{xml,csv}` and publishes the results as annota
 ## Usage
 
 Add the Action to the workflow, basic example can be found below.
+See [Releases](https://github.com/Bonajo/pitest-report-action/releases) for the latest version.
 
 ```yaml
 - name: Publish Pitest Report
-  uses: Bonajo/pitest-report-action@v1.0.0
+  uses: Bonajo/pitest-report-action@v1.2.0
   with:
     file: target/pit-reports/mutations.xml
 ```
@@ -87,3 +88,18 @@ This can be achieved by adding a permissions section to the workflow.
 permissions:
   checks: write
 ```
+
+## Releases
+
+Releases are automated with [semantic-release](https://semantic-release.gitbook.io/). Pull requests are squash merged, so the PR title becomes the commit on `main` and must follow [Conventional Commits](https://www.conventionalcommits.org/) (checked on every PR):
+
+| PR title | Release |
+|----------|---------|
+| `fix: ...`, `perf: ...` | patch (1.2.3 → 1.2.4) |
+| `feat: ...` | minor (1.2.3 → 1.3.0) |
+| `!` after the type (e.g. `feat!: ...`, `refactor!: ...`) or a `BREAKING CHANGE:` footer | major (1.2.3 → 2.0.0) |
+| `docs:`, `chore:`, `ci:`, `build:`, `refactor:`, `test:`, `style:`, `revert:` | no release |
+
+On every merge to `main` the next version is determined, tagged (`vX.Y.Z`) and a GitHub release is created. The bundled action in `dist/` is committed and checked in CI, so the tag is the release. The version in `package.json` is not the released version.
+
+Dependabot uses `fix(deps)` for runtime dependencies, because they are bundled into `dist/` and only reach users through a release, and `build(deps-dev)` for development dependencies, which are not released.

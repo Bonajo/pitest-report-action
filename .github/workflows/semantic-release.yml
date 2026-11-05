@@ -1,0 +1,55 @@
+name: Semantic release
+
+on:
+  push:
+    branches: [main]
+
+# Never cancel a release mid-flight: a half-run that has tagged but not yet
+# created the GitHub release would need cleaning up by hand.
+concurrency:
+  group: semantic-release-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+# The tag is the release: dist/ is committed and test.yml checks it is up to
+# date, so there is nothing to build or publish. Users reference the action by
+# the tag this job creates (Bonajo/pitest-report-action@vX.Y.Z).
+jobs:
+  release:
+    name: version
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # create the tag and the GitHub release
+      issues: write # comment "released in vX.Y.Z" on issues
+      pull-requests: write # and on the PRs that fed the release
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # semantic-release walks back to the previous tag to decide the bump,
+          # so a shallow clone makes it compute the wrong version.
+          fetch-depth: 0
+          persist-credentials: false
+
+      # Only provides npm for installing extra_plugins: the action itself runs
+      # semantic-release on the runner's bundled Node (node24). Same version as
+      # the rest of the repo.
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+
+      # Pinned to an exact version: this action publishes no floating major
+      # tags, so @v8 would not resolve. The plugins in .releaserc.json ship
+      # with the semantic-release core it bundles, the conventionalcommits
+      # preset (which understands `feat!:`) has to be installed. Version 9:
+      # version 10 needs a newer changelog writer than the bundled
+      # release-notes-generator uses.
+      - name: Semantic release
+        uses: cycjimmy/semantic-release-action@v8.1.3
+        with:
+          extra_plugins: |
+            conventional-changelog-conventionalcommits@9
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
