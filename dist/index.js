@@ -16,7 +16,7 @@ import require$$0$3 from 'node:net';
 import require$$2 from 'node:http';
 import require$$0$2 from 'node:stream';
 import require$$0 from 'node:buffer';
-import require$$0$4 from 'node:util';
+import require$$0$4, { promisify } from 'node:util';
 import require$$7 from 'node:querystring';
 import require$$8 from 'node:events';
 import require$$0$5 from 'node:diagnostics_channel';
@@ -35,6 +35,7 @@ import 'timers';
 import 'stream';
 import fs$1 from 'fs/promises';
 import path$2 from 'node:path';
+import { execFile } from 'node:child_process';
 
 // We use any as a valid input type
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -45740,15 +45741,16 @@ function matchesType(mutation, annotationType) {
  * @param reports array of reports
  * @param maxAnnotations max number of annotations to process (across all reports)
  * @param annotationType which mutations to include
+ * @param resolvePath finds the source file of a mutation, the class name is used when it is not found
  * @returns annotation[] annotations that can be used for Checks Run
  */
-function createAnnotations(reports, maxAnnotations, annotationType) {
+function createAnnotations(reports, maxAnnotations, annotationType, resolvePath = () => undefined) {
     return reports
-        .flatMap(report => report.mutations)
-        .filter(m => matchesType(m, annotationType))
+        .flatMap(report => report.mutations.map(mutation => ({ report, mutation })))
+        .filter(({ mutation }) => matchesType(mutation, annotationType))
         .slice(0, Math.max(maxAnnotations, 0))
-        .map((m) => ({
-        path: m.mutatedClass,
+        .map(({ report, mutation: m }) => ({
+        path: resolvePath(m, report) ?? m.mutatedClass,
         start_line: m.lineNumber,
         end_line: m.lineNumber,
         annotation_level: isDetected(m) ? "notice" : "warning",
@@ -45918,6 +45920,84 @@ function getCheckRunSha() {
     return context.sha;
 }
 
+const execFileAsync = promisify(execFile);
+/**
+ * List the files tracked by git, relative to the root of the repository.
+ * Annotations can only be shown on files in the repository, so untracked files (e.g. build output) are not needed.
+ * @param cwd directory inside the repository
+ * @returns Promise<string[]> the tracked files, empty if git is not available or cwd is not a git repository
+ */
+async function listRepositoryFiles(cwd = process.cwd()) {
+    try {
+        // ":/" lists the whole repository, also when cwd is a subdirectory
+        const { stdout } = await execFileAsync("git", ["ls-files", "-z", "--full-name", "--", ":/"], {
+            cwd,
+            maxBuffer: 256 * 1024 * 1024
+        });
+        return stdout.split("\0").filter(file => file.length > 0);
+    }
+    catch (error) {
+        warning(`Unable to list the repository files with git, annotations will use the class name as path. ` +
+            `Make sure the repository is checked out. Error: ${error.message}`);
+        return [];
+    }
+}
+/**
+ * Finds the source file of a mutation in the repository.
+ * Pitest only reports the class name and the file name of the source file, the path is derived from the package
+ * (e.g. com.example.Calculator in Calculator.java -> **\/com/example/Calculator.java).
+ */
+class SourceResolver {
+    filesByName = new Map();
+    /**
+     * @param files paths relative to the repository root, using / as separator (as returned by listRepositoryFiles)
+     */
+    constructor(files) {
+        for (const file of files) {
+            const name = file.substring(file.lastIndexOf("/") + 1);
+            const sameName = this.filesByName.get(name) ?? [];
+            sameName.push(file);
+            this.filesByName.set(name, sameName);
+        }
+    }
+    /**
+     * Find the source file of the mutation
+     * @param mutation the mutation to find the source file for
+     * @param reportPath path of the report the mutation is from, used to pick the file in the same module when
+     *                   multiple files match (e.g. the same class in multiple Maven modules)
+     * @returns string | undefined path relative to the repository root, undefined if no file matches
+     */
+    resolve(mutation, reportPath = "") {
+        if (!mutation.sourceFile) {
+            return undefined;
+        }
+        // Inner classes (Outer$Inner) are in the source file of the outer class, so only the package is needed
+        const lastDot = mutation.mutatedClass.lastIndexOf(".");
+        const packagePath = lastDot === -1 ? "" : mutation.mutatedClass.substring(0, lastDot).replace(/\./g, "/") + "/";
+        const suffix = packagePath + mutation.sourceFile;
+        const candidates = (this.filesByName.get(mutation.sourceFile) ?? [])
+            .filter(file => file === suffix || file.endsWith("/" + suffix));
+        if (candidates.length <= 1) {
+            return candidates[0];
+        }
+        const reportSegments = reportPath.replace(/\\/g, "/").split("/");
+        return candidates
+            .map(file => ({ file, shared: sharedSegments(file.split("/"), reportSegments) }))
+            .sort((a, b) => b.shared - a.shared || a.file.localeCompare(b.file))[0]
+            .file;
+    }
+}
+/**
+ * Number of leading path segments two paths have in common
+ */
+function sharedSegments(a, b) {
+    let shared = 0;
+    while (shared < a.length && shared < b.length && a[shared] === b[shared]) {
+        shared++;
+    }
+    return shared;
+}
+
 /**
  * Main method for the pitest report action
  */
@@ -45977,7 +46057,15 @@ async function run() {
         // Read the mutation reports and parse to objects
         const reports = await Promise.all(paths.map(path => parseMutationReport(path)));
         // Create the annotations
-        const annotations = createAnnotations(reports, maxAnnotations, annotationTypes);
+        // Place the annotations on the source files in the repository
+        const sources = new SourceResolver(await listRepositoryFiles());
+        const annotations = createAnnotations(reports, maxAnnotations, annotationTypes, (mutation, report) => {
+            const path = sources.resolve(mutation, report.path);
+            if (path === undefined) {
+                info(`Source file of ${mutation.mutatedClass} not found in the repository, using the class name as path`);
+            }
+            return path;
+        });
         // Create summary
         const results = reports
             .flatMap(report => report.mutations)

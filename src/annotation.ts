@@ -36,22 +36,30 @@ function matchesType(mutation: Mutation, annotationType: AnnotationType): boolea
 }
 
 /**
+ * Find the path of the source file of a mutation, relative to the repository root
+ * @returns string | undefined the path, or undefined if the source file is not found
+ */
+export type PathResolver = (mutation: Mutation, report: Report) => string | undefined;
+
+/**
  * Create Check Runs Annotation for every selected annotation
  * @param reports array of reports
  * @param maxAnnotations max number of annotations to process (across all reports)
  * @param annotationType which mutations to include
+ * @param resolvePath finds the source file of a mutation, the class name is used when it is not found
  * @returns annotation[] annotations that can be used for Checks Run
  */
 export function createAnnotations(
         reports: Report[],
         maxAnnotations: number,
-        annotationType: AnnotationType): Annotation[] {
+        annotationType: AnnotationType,
+        resolvePath: PathResolver = () => undefined): Annotation[] {
     return reports
-        .flatMap(report => report.mutations)
-        .filter(m => matchesType(m, annotationType))
+        .flatMap(report => report.mutations.map(mutation => ({report, mutation})))
+        .filter(({mutation}) => matchesType(mutation, annotationType))
         .slice(0, Math.max(maxAnnotations, 0))
-        .map((m): Annotation => ({
-            path: m.mutatedClass,
+        .map(({report, mutation: m}): Annotation => ({
+            path: resolvePath(m, report) ?? m.mutatedClass,
             start_line: m.lineNumber,
             end_line: m.lineNumber,
             annotation_level: isDetected(m) ? "notice" : "warning",

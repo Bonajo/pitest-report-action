@@ -66,6 +66,18 @@ no-coverage:
   description: Total number of mutations without test coverage
 ```
 
+## Annotations
+
+Annotations are placed on the source file of the mutated class, so they show up next to the code in pull requests.
+Pitest only reports the class name and the name of the source file, so the action looks for a file tracked by git in the
+directory of the package, e.g. `com.example.Calculator` in `Calculator.java` is found at
+`src/main/java/com/example/Calculator.java`. This works for any source root and language (Java, Kotlin, ...).
+In a multi-module project with the same class in several modules, the file in the module of the report is used.
+
+The repository has to be checked out (e.g. with `actions/checkout`) for this to work. When the source file is not
+found, the class name is used as path: the annotation is still shown in the check run and the workflow summary, but not
+next to the code.
+
 ## Mutation statuses
 
 The statuses reported by Pitest are counted the same way as Pitest does:

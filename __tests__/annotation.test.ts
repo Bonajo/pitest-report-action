@@ -1,4 +1,4 @@
-import {describe, expect, test} from "@jest/globals";
+import {describe, expect, jest, test} from "@jest/globals";
 import {AnnotationType, createAnnotations, MAX_TEXT_SIZE, MAX_TITLE_SIZE} from "../src/annotation.js";
 import {Mutation, MutationStatus, Report} from "../src/report.js";
 import {createMutation} from "./helpers.js";
@@ -81,6 +81,31 @@ describe('content', () => {
             title: "SURVIVED -> com.example.TestClass:testMethod",
             raw_details: JSON.stringify(mutation, null, 2)
         });
+    });
+
+    test('uses the path of the source file when it is resolved', () => {
+        const mutation = createMutation();
+        const reports = [report([mutation], "module/target/pit-reports/mutations.xml")];
+        const resolvePath = jest.fn((_mutation: Mutation, _report: Report): string | undefined => "src/main/java/com/example/TestClass.java");
+
+        const [annotation] = createAnnotations(reports, 1, "ALL", resolvePath);
+
+        expect(annotation.path).toBe("src/main/java/com/example/TestClass.java");
+        expect(resolvePath).toHaveBeenCalledWith(mutation, reports[0]);
+    });
+
+    test('falls back to the class name when the source file is not resolved', () => {
+        const [annotation] = createAnnotations([report([createMutation()])], 1, "ALL", () => undefined);
+
+        expect(annotation.path).toBe("com.example.TestClass");
+    });
+
+    test('only resolves the paths of the annotations that are created', () => {
+        const resolvePath = jest.fn((_mutation: Mutation, _report: Report): string | undefined => undefined);
+
+        createAnnotations([realReport()], 2, "ALL", resolvePath);
+
+        expect(resolvePath).toHaveBeenCalledTimes(2);
     });
 
     test.each([undefined, ""])('message falls back to the mutator when description is %p', (description) => {
