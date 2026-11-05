@@ -1,6 +1,6 @@
 {
   "name": "pitest-report-action",
-  "version": "0.8.0",
+  "version": "0.0.0-development",
   "description": "Publish pitest reports from GitHub Action",
   "type": "module",
   "main": "dist/index.js",
@@ -9,7 +9,7 @@
   },
   "scripts": {
     "test": "NODE_OPTIONS=--experimental-vm-modules NODE_NO_WARNINGS=1 jest",
-    "build": "tsc --noEmit",
+    "build": "tsc --noEmit -p tsconfig.test.json",
     "local-action": "npx @github/local-action . src/main.ts .env",
     "package": "rimraf ./dist && rollup --config rollup.config.ts --configPlugin @rollup/plugin-typescript"
   },

@@ -23,6 +23,8 @@ jobs:
       - name: Install dependencies
         if: steps.cached-modules.outputs.cache-hit != 'true'
         run: npm ci
+      - name: Type check sources and tests
+        run: npm run build
       - name: Run all tests
         run: npm test
       - name: Check dist is up to date

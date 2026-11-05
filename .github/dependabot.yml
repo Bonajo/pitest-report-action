@@ -1,0 +1,50 @@
+# Weekly version updates. Security updates (repo setting) come on top of
+# these, outside the schedule, as soon as an advisory hits a version we use.
+#
+# PR titles must be conventional: the "conventional title" check is required
+# on main, and semantic-release parses the squash commit.
+#   - npm runtime dependencies use "fix": they are bundled into dist/, so a
+#     merge has to cut a patch release for the update to reach users.
+#   - npm dev dependencies use "build": build and test tooling only, no release.
+#   - github-actions uses "ci": CI-only, no release.
+# The prefix also applies to Dependabot security-update PRs.
+#
+# dist/ is not rebuilt by Dependabot: on PRs that change runtime dependencies,
+# run `npm run package` and commit the result, otherwise the dist check fails.
+version: 2
+
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Europe/Amsterdam
+    commit-message:
+      prefix: fix
+      prefix-development: build
+      include: scope
+    groups:
+      # One PR per dependency type for all minor/patch bumps; majors still
+      # come one per PR.
+      npm-production:
+        dependency-type: production
+        update-types: [minor, patch]
+      npm-development:
+        dependency-type: development
+        update-types: [minor, patch]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Europe/Amsterdam
+    commit-message:
+      prefix: ci
+      include: scope
+    groups:
+      actions:
+        patterns: ["*"]
