@@ -34,7 +34,7 @@
     "@actions/glob": "^0.7.0",
     "@octokit/webhooks-types": "^7.6.1",
     "csv-parse": "^7.0.3",
-    "fast-xml-parser": "^5.10.1"
+    "fast-xml-parser": "^5.12.1"
   },
   "devDependencies": {
     "@github/local-action": "^7.0.1",
