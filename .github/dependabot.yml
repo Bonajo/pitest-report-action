@@ -25,6 +25,13 @@ updates:
       prefix: fix
       prefix-development: build
       include: scope
+    ignore:
+      # rollup's Linux binary, in optionalDependencies so CI always installs
+      # it. Dependabot counts optional dependencies as production, so its own
+      # bumps got a "fix" title and cut a release for a build tool (v1.3.1).
+      # npm already moves it to the new version with every rollup bump in the
+      # npm-development group.
+      - dependency-name: "@rollup/rollup-linux-x64-gnu"
     groups:
       # One PR per dependency type for all minor/patch bumps; majors still
       # come one per PR.
